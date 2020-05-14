@@ -27,24 +27,19 @@ public class Graphics {
     final int WINDOW_HEIGHT = 512;
     final int WINDOW_WIDTH = 512;
 
-    final short NUM_VAOS = 1;
-    final short VERTICES_BUFFER = 0;
-    final short ELEMENTS_BUFFER = 1;
-    final short NORMALS_BUFFER = 2;
-    final short NUM_VBOS = 3;
     int vao;
-    int[] vbo = new int[NUM_VBOS];
+    int vbo;
+    int ebo;
 
     // Render objects
     Camera cam;
     Scene scene;
     BufferManager bm;
 
-    // TODO take a scene
     public Graphics(Scene scene) {
         this.cam = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
         this.scene = scene;
-        this.bm = new BufferManager(scene);
+        this.bm = new BufferManager();
     }
 
     public void run() {
@@ -77,8 +72,6 @@ public class Graphics {
         program = createProgram(VERT, FRAG);
         glUseProgram(program);
     }
-
-
 
     private void setupGLFW() {
         // GLFW
@@ -129,15 +122,15 @@ public class Graphics {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
-        float[] vertices = bm.generateVertexData();
-        int[] elements = bm.generateElementData();
-
-        glGenBuffers(vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[VERTICES_BUFFER]);
-        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[ELEMENTS_BUFFER]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements, GL_STATIC_DRAW);
+        for(GameObject obj : scene.getObjects()){
+            int v = glGenBuffers();
+            int e = glGenBuffers();
+            glBindBuffer(GL_ARRAY_BUFFER, v);
+            glBufferData(GL_ARRAY_BUFFER, obj.getVerticesFloats(), GL_STATIC_DRAW);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, e);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getMesh().getIndices(), GL_STATIC_DRAW);
+            bm.load(v, e, obj.getMesh(), obj.getModelMatrix());
+        }
     }
 
     private int createProgram(String vert, String frag) {
@@ -190,18 +183,8 @@ public class Graphics {
         pMat.get(pBuf);
         glUniformMatrix4fv(pLoc, false, pBuf);
 
-        // Bind buffers and enable shader variables
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[VERTICES_BUFFER]);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-        glEnableVertexAttribArray(0);
-
-        for (GameObject obj : scene.getObjects()) {
-            int first = bm.getFirstVertexIndex(obj.mesh());
-            int offset = bm.getElementOffset(obj.mesh());
-
-            //System.out.println("Rendering " + obj.mesh.name + " from index " + first + " to " + last);
-
-            Matrix4f mMat = obj.getModelMatrix();    // TODO this needs to be done once per object. Combined Buffer and Object manager, or separate ones with dependencies?
+        for (VBO vbo : bm.getVBOs()) {
+            Matrix4f mMat = vbo.getModelMatrix();    // TODO this needs to be done once per object. Combined Buffer and Object manager, or separate ones with dependencies?
             Matrix4f mvMat = new Matrix4f();
             vMat.mul(mMat, mvMat);
 
@@ -210,9 +193,15 @@ public class Graphics {
             mvMat.get(mvBuf);
             glUniformMatrix4fv(mvLoc, false, mvBuf);
 
+            // Bind buffers and enable shader variables
+            glBindBuffer(GL_ARRAY_BUFFER, vbo.getVertexID());
+            glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+            glEnableVertexAttribArray(0);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.elementID);
+
             // Draw the vertex buffers! TODO multiple buffer support, possible indexed as well
-//            glDrawArrays(GL_TRIANGLES, first, obj.mesh().vertexCount());
-            glDrawElements(GL_TRIANGLES, obj.mesh().faceCount(), GL_UNSIGNED_INT, offset);
+            glDrawElements(GL_TRIANGLES, vbo.getIndices().length, GL_UNSIGNED_INT, 0);
         }
 
         // V-sync and key events!

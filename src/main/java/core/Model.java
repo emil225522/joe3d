@@ -1,7 +1,6 @@
 package core;
 
 import org.joml.Vector3f;
-import org.joml.Vector3i;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -61,9 +60,9 @@ public class Model extends Mesh {
             vertices[i] = vList.get(i);
         }
 
-        faces = new int[fList.size()];
+        indices = new int[fList.size()];
         for (int i = 0; i < fList.size(); i++){
-            faces[i] = fList.get(i);
+            indices[i] = fList.get(i);
         }
     }
 }

@@ -46,7 +46,7 @@ public class GameObject {
         return mesh.vertices.length;
     }
 
-    public Mesh mesh(){
+    public Mesh getMesh(){
         return mesh;
     }
 }

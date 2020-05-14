@@ -1,22 +1,17 @@
 package core;
 
 import org.joml.Vector3f;
-import org.joml.Vector3i;
 
 import java.util.Arrays;
 
 public class Mesh {
     String name;
     Vector3f[] vertices;
-    int[] faces;
+    int[] indices;
     Vector3f[] normals;
 
     public int vertexCount(){
         return vertices.length;
-    }
-
-    public int faceCount(){
-        return faces.length;
     }
 
     // TODO is this the most sensible way?
@@ -43,7 +38,7 @@ public class Mesh {
         return Arrays.hashCode(vertices);
     }
 
-    public int[] getFaces() {
-        return faces;
+    public int[] getIndices() {
+        return indices;
     }
 }
