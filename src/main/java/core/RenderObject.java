@@ -1,6 +1,4 @@
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import render.Mesh;
+package core;
 
 public class RenderObject extends GameObject {
     Mesh mesh;

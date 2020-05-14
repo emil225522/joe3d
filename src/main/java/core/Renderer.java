@@ -1,9 +1,11 @@
+package core;
+import org.lwjgl.BufferUtils;
+import utility.*;
+
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
-import render.Mesh;
-import render.Model;
 
 import java.nio.*;
 
@@ -17,8 +19,8 @@ public class Renderer {
     private long window;
     private int program;
 
-    final String VERT = getClass().getResource("triangles.vert").getPath();
-    final String FRAG = getClass().getResource("triangles.frag").getPath();
+    final String VERT = Paths.SHADERS+ "triangles.vert";
+    final String FRAG = Paths.SHADERS+ "triangles.frag";
 
     final int WINDOW_HEIGHT = 512;
     final int WINDOW_WIDTH = 512;
@@ -31,7 +33,7 @@ public class Renderer {
 
     // Render objects
     Camera cam;
-    Mesh m = new Model(getClass().getResource("models/quad.obj").getPath());
+    Mesh m = new Model(Paths.MODELS+"quad.obj");
     RenderObject ro = new RenderObject(m);
 
     public void run(){
@@ -75,7 +77,7 @@ public class Renderer {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Renderer", NULL, NULL);
+        window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "core.Renderer", NULL, NULL);
         if(window==NULL) throw new RuntimeException("Failed to create the GLFW window");
 
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
@@ -144,14 +146,30 @@ public class Renderer {
     private void loop(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        int pLoc = glGetUniformLocation(program, "pMat");
+        int mvLoc = glGetUniformLocation(program, "mvMat");
+
+        Matrix4f pMat = cam.getPerspective();
+        Matrix4f vMat = cam.lookAt(ro.getPosition());
+        Matrix4f mMat = ro.getModelMatrix();
+        Matrix4f mvMat = new Matrix4f();
+        mMat.mul(vMat, mvMat);
+
+        FloatBuffer pBuf = BufferUtils.createFloatBuffer(16);
+        pMat.get(pBuf);
+        glUniformMatrix4fv(pLoc, false, pBuf);
+
+        FloatBuffer mvBuf = BufferUtils.createFloatBuffer(16);
+        mvMat.get(mvBuf);
+        glUniformMatrix4fv(mvLoc, false, mvBuf);
+
         glBindBuffer(GL_ARRAY_BUFFER, vbo[TRIANGLES]);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
         glEnableVertexAttribArray(0);
 
-        Matrix4f vMat = cam.lookAt(ro.getPosition());
-
         glDrawArrays(GL_TRIANGLES, 0, ro.getVerticesFloats().length);
 
+        // vsync and key events!
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

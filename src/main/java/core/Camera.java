@@ -1,3 +1,5 @@
+package core;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -12,5 +14,9 @@ public class Camera {
 
     public Matrix4f lookAt(Vector3f target){
         return new Matrix4f().lookAt(position, target, new Vector3f(0,1,0));
+    }
+
+    public Matrix4f getPerspective() {
+        return perspective;
     }
 }

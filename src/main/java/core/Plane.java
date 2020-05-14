@@ -1,10 +1,6 @@
-package render;
+package core;
 
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
-
-import java.nio.FloatBuffer;
 
 public class Plane extends Mesh {
     public Plane() {
