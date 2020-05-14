@@ -28,20 +28,23 @@ public class Graphics {
     final int WINDOW_WIDTH = 512;
 
     final short NUM_VAOS = 1;
-    final short RENDER_OBJECTS = 0;
-    final short NUM_VBOS = 1;
+    final short VERTICES_BUFFER = 0;
+    final short ELEMENTS_BUFFER = 1;
+    final short NORMALS_BUFFER = 2;
+    final short NUM_VBOS = 3;
     int vao;
     int[] vbo = new int[NUM_VBOS];
-    int bufferIndexPointer = 0;
 
     // Render objects
     Camera cam;
-    Mesh m = new Model(Paths.MODELS + "quad.obj");
-    RenderObject ro = new RenderObject(m);
+    Scene scene;
+    BufferManager bm;
 
     // TODO take a scene
-    public Graphics(){
-        cam = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
+    public Graphics(Scene scene) {
+        this.cam = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
+        this.scene = scene;
+        this.bm = new BufferManager(scene);
     }
 
     public void run() {
@@ -60,9 +63,13 @@ public class Graphics {
     private void init() {
         setupGLFW();
         GL.createCapabilities();
+        setupCallbacks();
+
+        glFrontFace(GL_CCW);
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_DEPTH);
+        glDepthFunc(GL_LEQUAL);
         glClearColor(0.2f, 0.2f, 0.2f, 1);
 
         setupVertices();
@@ -70,6 +77,8 @@ public class Graphics {
         program = createProgram(VERT, FRAG);
         glUseProgram(program);
     }
+
+
 
     private void setupGLFW() {
         // GLFW
@@ -82,14 +91,6 @@ public class Graphics {
 
         window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "core.Renderer", NULL, NULL);
         if (window == NULL) throw new RuntimeException("Failed to create the GLFW window");
-
-        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-        glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
-            else if (key == GLFW_KEY_W && action == GLFW_PRESS)
-                ; // TODO add camera moves forward! DEBUG
-        });
 
         // Center window
         try (MemoryStack stack = stackPush()) {
@@ -105,16 +106,38 @@ public class Graphics {
         glfwShowWindow(window);
     }
 
+    private void setupCallbacks() {
+        // Setup a key callback
+        glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
+                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+            else if (key == GLFW_KEY_W && action == GLFW_PRESS)
+                ; // TODO add camera moves forward! DEBUG
+        });
+
+        // Window resize callback
+        glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallback() {
+            @Override
+            public void invoke(long window, int width, int height) {
+                glViewport(0,0,width, height);
+                cam.setPerspective((float)width/(float)height);
+            }
+        });
+    }
+
     private void setupVertices() {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
-        glGenBuffers(vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[RENDER_OBJECTS]);
-        glBufferData(GL_ARRAY_BUFFER, ro.getVerticesFloats(), GL_STATIC_DRAW);
+        float[] vertices = bm.generateVertexData();
+        int[] elements = bm.generateElementData();
 
-        // Transform render objects
-        ro.scale(1);
+        glGenBuffers(vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[VERTICES_BUFFER]);
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[ELEMENTS_BUFFER]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements, GL_STATIC_DRAW);
     }
 
     private int createProgram(String vert, String frag) {
@@ -158,31 +181,44 @@ public class Graphics {
         int pLoc = glGetUniformLocation(program, "pMat");
         int mvLoc = glGetUniformLocation(program, "mvMat");
 
-        // Setup matrices
+        // Create perspective and view matrices
         Matrix4f pMat = cam.getPerspective();
         Matrix4f vMat = cam.lookAt(new Vector3f(0, 0, -1));
-        Matrix4f mMat = ro.getModelMatrix();    // TODO this needs to be done once per object. Combined Buffer and Object manager, or separate ones with dependencies?
-        Matrix4f mvMat = new Matrix4f();
-        vMat.mul(mMat, mvMat);
 
-        // Set shader uniforms
+        // Set shader perspective uniform
         FloatBuffer pBuf = BufferUtils.createFloatBuffer(16);
         pMat.get(pBuf);
         glUniformMatrix4fv(pLoc, false, pBuf);
-        FloatBuffer mvBuf = BufferUtils.createFloatBuffer(16);  // TODO this needs to be done once per object
-        mvMat.get(mvBuf);
-        glUniformMatrix4fv(mvLoc, false, mvBuf);
 
         // Bind buffers and enable shader variables
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[RENDER_OBJECTS]);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[VERTICES_BUFFER]);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
         glEnableVertexAttribArray(0);
 
-        // Draw the vertex buffers! TODO multiple buffer support, possible indexed as well
-        glDrawArrays(GL_TRIANGLES, 0, ro.getVertexCount());
+        for (GameObject obj : scene.getObjects()) {
+            int first = bm.getFirstVertexIndex(obj.mesh());
+            int offset = bm.getElementOffset(obj.mesh());
+
+            //System.out.println("Rendering " + obj.mesh.name + " from index " + first + " to " + last);
+
+            Matrix4f mMat = obj.getModelMatrix();    // TODO this needs to be done once per object. Combined Buffer and Object manager, or separate ones with dependencies?
+            Matrix4f mvMat = new Matrix4f();
+            vMat.mul(mMat, mvMat);
+
+            // Set modelview shader uniform
+            FloatBuffer mvBuf = BufferUtils.createFloatBuffer(16);  // TODO this needs to be done once per object
+            mvMat.get(mvBuf);
+            glUniformMatrix4fv(mvLoc, false, mvBuf);
+
+            // Draw the vertex buffers! TODO multiple buffer support, possible indexed as well
+//            glDrawArrays(GL_TRIANGLES, first, obj.mesh().vertexCount());
+            glDrawElements(GL_TRIANGLES, obj.mesh().faceCount(), GL_UNSIGNED_INT, offset);
+        }
 
         // V-sync and key events!
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+
     }
 }

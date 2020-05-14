@@ -8,21 +8,33 @@ public class Transform {
     private Vector3f scale;
     private Quaternionf rotation;
 
-    public Transform(){
+    public Transform() {
         this.position = new Vector3f();
         this.scale = new Vector3f(1);
         this.rotation = new Quaternionf();
     }
 
+    public void translate(Vector3f translation) {
+        position.add(translation);
+    }
+
+    public void scale(float scalar) {
+        scale.mul(scalar);
+    }
+
+    public void rotate(float deg, float x, float y, float z){
+        rotation.rotateAxis(deg, x, y, z);
+    }
+
     public Vector3f getPosition() {
-        return position;
+        return new Vector3f(position);
     }
 
     public Vector3f getScale() {
-        return scale;
+        return new Vector3f(scale);
     }
 
     public Quaternionf getRotation() {
-        return rotation;
+        return new Quaternionf(rotation);
     }
 }

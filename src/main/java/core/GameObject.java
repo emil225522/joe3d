@@ -3,11 +3,13 @@ package core;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public class GameObject{
+public class GameObject {
     Transform transform;
+    Mesh mesh;
 
-    public GameObject(){
-        transform = new Transform();
+    public GameObject(Mesh mesh){
+        this.transform = new Transform();
+        this.mesh = mesh;
     }
 
     public Vector3f getPosition() {
@@ -23,6 +25,28 @@ public class GameObject{
     }
 
     public void scale(float scalar){
-        transform.getScale().mul(scalar);
+        transform.scale(scalar);
+    }
+
+    public void translate(Vector3f translation){
+        transform.translate(translation);
+    }
+
+    public void translate(float x, float y, float z){
+        translate(new Vector3f(x,y,z));
+    }
+
+
+
+    public float[] getVerticesFloats() {
+        return mesh.getVerticesFloats();
+    }
+
+    public int getVertexCount(){
+        return mesh.vertices.length;
+    }
+
+    public Mesh mesh(){
+        return mesh;
     }
 }

@@ -19,4 +19,8 @@ public class Camera {
     public Matrix4f getPerspective() {
         return perspective;
     }
+
+    public void setPerspective(float aspect) {
+        perspective = new Matrix4f().setPerspective((float)Math.toRadians(60), aspect, 0.1f, 1000f);
+    }
 }
