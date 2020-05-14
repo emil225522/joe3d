@@ -132,7 +132,7 @@ public class Renderer {
             glBufferData(GL_ARRAY_BUFFER, obj.getMesh().getVerticesFloats(), GL_STATIC_DRAW);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, e);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getMesh().getIndices(), GL_STATIC_DRAW);
-            bm.load(v, e, obj.getMesh(), obj.getModelMatrix());
+            bm.load(v, e, obj);
         }
     }
 
@@ -176,6 +176,7 @@ public class Renderer {
         // Get shader uniforms
         int pLoc = glGetUniformLocation(program, "pMat");
         int mvLoc = glGetUniformLocation(program, "mvMat");
+        int colorLoc = glGetUniformLocation(program, "color");
 
         // Create perspective and view matrices
         Matrix4f pMat = cam.getPerspective();
@@ -186,8 +187,8 @@ public class Renderer {
         pMat.get(pBuf);
         glUniformMatrix4fv(pLoc, false, pBuf);
 
-        for (VBO vbo : bm.getVBOs()) {
-            Matrix4f mMat = vbo.getModelMatrix();
+        for (BufferInfo b : bm.getVBOs()) {
+            Matrix4f mMat = b.getModelMatrix();
             Matrix4f mvMat = new Matrix4f();
             vMat.mul(mMat, mvMat);
 
@@ -195,16 +196,17 @@ public class Renderer {
             FloatBuffer mvBuf = BufferUtils.createFloatBuffer(16);
             mvMat.get(mvBuf);
             glUniformMatrix4fv(mvLoc, false, mvBuf);
+            glUniform4fv(colorLoc, b.getMaterial().getColor());
 
             // Bind buffers and enable shader variables
-            glBindBuffer(GL_ARRAY_BUFFER, vbo.getVertexID());
+            glBindBuffer(GL_ARRAY_BUFFER, b.getVBO());
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
             glEnableVertexAttribArray(0);
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.elementID);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, b.getEBO());
 
             // Draw the vertex buffers!
-            glDrawElements(GL_TRIANGLES, vbo.getIndices().length, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, b.getIndices().length, GL_UNSIGNED_INT, 0);
         }
 
         // V-sync and key events!

@@ -5,6 +5,10 @@ import java.awt.*;
 public class Material {
     float[] color;
 
+    public Material(){
+        color = new float[]{0.5f,0.5f,0.5f,1.0f};
+    }
+
     public Material(float[] color){
         if(color.length < 3 || color.length > 4) throw new IllegalArgumentException("The color argument needs to consist of 3 or 4 float values.");
         if(color.length == 4) this.color = color;
@@ -13,5 +17,13 @@ public class Material {
 
     public Material(Color color){
         this.color = color.getRGBComponents(null);
+    }
+
+    public float[] getColor() {
+        return color;
+    }
+
+    public void setColor(float[] color) {
+        this.color = color;
     }
 }

@@ -1,7 +1,9 @@
 package core.geometry;
 
+import core.Material;
 import org.joml.Vector3f;
 
+import java.awt.*;
 import java.util.Arrays;
 
 public class Mesh {
@@ -41,4 +43,5 @@ public class Mesh {
     public int[] getIndices() {
         return indices;
     }
+
 }

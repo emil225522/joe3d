@@ -11,6 +11,7 @@ public class GameObject {
     public GameObject(Mesh mesh){
         this.transform = new Transform();
         this.mesh = mesh;
+        this.material = new Material();
     }
 
     public Matrix4f getModelMatrix(){
@@ -27,5 +28,9 @@ public class GameObject {
 
     public Transform getTransform() {
         return transform;
+    }
+
+    public Material getMaterial() {
+        return material;
     }
 }

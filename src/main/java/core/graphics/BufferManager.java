@@ -1,5 +1,6 @@
 package core.graphics;
 
+import core.GameObject;
 import core.geometry.Mesh;
 import org.joml.Matrix4f;
 
@@ -8,17 +9,17 @@ import java.util.List;
 
 // TODO very crude solution. Should look into something less memory heavy or even singular VBO solution, once I get the hang of OpenGL
 public class BufferManager {
-    List<VBO> vbos;
+    List<BufferInfo> bufferInfos;
 
     public BufferManager(){
-        vbos = new ArrayList<>();
+        bufferInfos = new ArrayList<>();
     }
 
-    public void load(int vid, int eid, Mesh mesh, Matrix4f modelMatrix){
-        vbos.add(new VBO(vid, eid, mesh, modelMatrix));
+    public void load(int vid, int eid, GameObject obj){
+        bufferInfos.add(new BufferInfo(vid, eid, obj));
     }
 
-    public List<VBO> getVBOs(){
-        return vbos;
+    public List<BufferInfo> getVBOs(){
+        return bufferInfos;
     }
 }
