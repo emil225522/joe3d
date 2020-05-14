@@ -1,5 +1,8 @@
-package core;
+package core.graphics;
 
+import core.Camera;
+import core.GameObject;
+import core.Scene;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import utility.*;
@@ -17,7 +20,7 @@ import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class Graphics {
+public class Renderer {
     private long window;
     private int program;
 
@@ -27,17 +30,17 @@ public class Graphics {
     final int WINDOW_HEIGHT = 512;
     final int WINDOW_WIDTH = 512;
 
+    // Buffers and containers for such stuff
     int vao;
-    int vbo;
-    int ebo;
-
-    // Render objects
-    Camera cam;
-    Scene scene;
     BufferManager bm;
 
-    public Graphics(Scene scene) {
-        this.cam = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
+    // Abstract objects
+    Camera cam;
+    Scene scene;
+
+
+    public Renderer(Scene scene) {
+        this.cam = scene.getMainCamera();
         this.scene = scene;
         this.bm = new BufferManager();
     }
@@ -82,7 +85,7 @@ public class Graphics {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "core.Renderer", NULL, NULL);
+        window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "core.rendering.Renderer", NULL, NULL);
         if (window == NULL) throw new RuntimeException("Failed to create the GLFW window");
 
         // Center window
@@ -126,7 +129,7 @@ public class Graphics {
             int v = glGenBuffers();
             int e = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, v);
-            glBufferData(GL_ARRAY_BUFFER, obj.getVerticesFloats(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, obj.getMesh().getVerticesFloats(), GL_STATIC_DRAW);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, e);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getMesh().getIndices(), GL_STATIC_DRAW);
             bm.load(v, e, obj.getMesh(), obj.getModelMatrix());
@@ -184,12 +187,12 @@ public class Graphics {
         glUniformMatrix4fv(pLoc, false, pBuf);
 
         for (VBO vbo : bm.getVBOs()) {
-            Matrix4f mMat = vbo.getModelMatrix();    // TODO this needs to be done once per object. Combined Buffer and Object manager, or separate ones with dependencies?
+            Matrix4f mMat = vbo.getModelMatrix();
             Matrix4f mvMat = new Matrix4f();
             vMat.mul(mMat, mvMat);
 
             // Set modelview shader uniform
-            FloatBuffer mvBuf = BufferUtils.createFloatBuffer(16);  // TODO this needs to be done once per object
+            FloatBuffer mvBuf = BufferUtils.createFloatBuffer(16);
             mvMat.get(mvBuf);
             glUniformMatrix4fv(mvLoc, false, mvBuf);
 
@@ -200,7 +203,7 @@ public class Graphics {
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.elementID);
 
-            // Draw the vertex buffers! TODO multiple buffer support, possible indexed as well
+            // Draw the vertex buffers!
             glDrawElements(GL_TRIANGLES, vbo.getIndices().length, GL_UNSIGNED_INT, 0);
         }
 

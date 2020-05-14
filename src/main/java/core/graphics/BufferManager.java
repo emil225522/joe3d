@@ -1,15 +1,14 @@
-package core;
+package core.graphics;
 
+import core.geometry.Mesh;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+// TODO very crude solution. Should look into something less memory heavy or even singular VBO solution, once I get the hang of OpenGL
 public class BufferManager {
     List<VBO> vbos;
-    static int id = 0;
 
     public BufferManager(){
         vbos = new ArrayList<>();

@@ -18,8 +18,16 @@ public class Transform {
         position.add(translation);
     }
 
+    public void translate(float x, float y, float z) {
+        position.add(x,y,z);
+    }
+
     public void scale(float scalar) {
         scale.mul(scalar);
+    }
+
+    public void scale(float x, float y, float z){
+        scale.mul(x,y,z);
     }
 
     public void rotate(float deg, float x, float y, float z){

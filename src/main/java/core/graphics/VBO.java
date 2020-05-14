@@ -1,5 +1,6 @@
-package core;
+package core.graphics;
 
+import core.geometry.Mesh;
 import org.joml.Matrix4f;
 
 public class VBO {

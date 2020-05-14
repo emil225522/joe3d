@@ -4,16 +4,21 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class Camera {
-    private Vector3f position;
+    private Transform transform;
     private Matrix4f perspective;
 
     public Camera(float width, float height){
-        position = new Vector3f(0f, 0, 5f);
+        transform = new Transform();
+        transform.translate(0,0,5);
         perspective = new Matrix4f().setPerspective((float)Math.toRadians(60), width/height, 0.1f, 1000f);
     }
 
+    public Transform getTransform() {
+        return transform;
+    }
+
     public Matrix4f lookAt(Vector3f target){
-        return new Matrix4f().lookAt(position, target, new Vector3f(0,1,0));
+        return new Matrix4f().lookAt(transform.getPosition(), target, new Vector3f(0,1,0));
     }
 
     public Matrix4f getPerspective() {
