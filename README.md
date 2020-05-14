@@ -46,4 +46,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 * **V. Scott Gordon, John L. Clevenger** 
     * *Computer Graphics Programming in OpenGL with Java* - _A great intro book on the subject._
+* **Dave Shreiner, Graham Sellers, John Kessenich, Bill Licea-Kane**
     * *OpenGL Programming Guide* - _A meatier but heavier intro book on the subject._
