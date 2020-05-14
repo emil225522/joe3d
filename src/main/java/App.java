@@ -1,7 +1,7 @@
-import core.Renderer;
+import core.Graphics;
 
 public class App {
     public static void main(String[] args) {
-        new Renderer().run();
+        new Graphics().run();
     }
 }

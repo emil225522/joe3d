@@ -21,4 +21,8 @@ public class GameObject{
         m.rotate(transform.getRotation());
         return m;
     }
+
+    public void scale(float scalar){
+        transform.getScale().mul(scalar);
+    }
 }

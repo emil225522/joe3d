@@ -46,7 +46,7 @@ rotation : Quaternionf</panel_attributes>
       <w>100</w>
       <h>70</h>
     </coordinates>
-    <panel_attributes>core.Renderer
+    <panel_attributes>core.Graphics
 </panel_attributes>
     <additional_attributes/>
   </element>

@@ -2,6 +2,8 @@ package core;
 
 import org.joml.Vector3f;
 
+import java.util.Arrays;
+
 public class Mesh {
     String name;
     Vector3f[] vertices;
@@ -15,5 +17,18 @@ public class Mesh {
             vs[3*i+2] = vertices[i].z;
         }
         return vs;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Mesh mesh = (Mesh) o;
+        return Arrays.equals(vertices, mesh.vertices);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(vertices);
     }
 }
