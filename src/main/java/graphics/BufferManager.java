@@ -1,9 +1,6 @@
-package core.graphics;
+package graphics;
 
 import core.GameObject;
-import core.geometry.Mesh;
-import org.joml.Matrix4f;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +12,7 @@ public class BufferManager {
         bufferInfos = new ArrayList<>();
     }
 
-    public void load(int vid, int eid, GameObject obj){
+    public void load(int vid, int eid, RenderObject obj){
         bufferInfos.add(new BufferInfo(vid, eid, obj));
     }
 

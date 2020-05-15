@@ -1,4 +1,4 @@
-package core.lights;
+package graphics;
 
 public class DirectionalLight extends Light  {
 }

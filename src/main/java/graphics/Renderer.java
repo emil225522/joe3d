@@ -1,9 +1,9 @@
-package core.graphics;
+package graphics;
 
-import core.Camera;
 import core.GameObject;
 import core.Scene;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import utility.*;
 
@@ -27,9 +27,6 @@ public class Renderer {
     final String VERT = Paths.SHADERS + "triangles.vert";
     final String FRAG = Paths.SHADERS + "triangles.frag";
 
-    final int WINDOW_HEIGHT = 512;
-    final int WINDOW_WIDTH = 512;
-
     // Buffers and containers for such stuff
     int vao;
     BufferManager bm;
@@ -37,14 +34,26 @@ public class Renderer {
     // Abstract objects
     Camera cam;
     Scene scene;
+    private Vector3fc cameraDirection = new Vector3f(0,0,-1);
 
-
+    /**
+     * Creates an OpenGL 3D renderer, operating in a GLFW-managed window. Throws exception if the scene has no main camera.
+     *
+     * @param scene the scene to render.
+     */
     public Renderer(Scene scene) {
-        this.cam = scene.getMainCamera();
+        try {
+            this.cam = scene.getMainCamera();
+        } catch (NullPointerException e) {
+            throw new NullPointerException("Unable to find a main camera in the scene.");
+        }
         this.scene = scene;
         this.bm = new BufferManager();
     }
 
+    /**
+     * Initializes the renderer and starts the render loop.
+     */
     public void run() {
         init();
 
@@ -67,6 +76,7 @@ public class Renderer {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_DEPTH);
+        glEnable(GL_MULTISAMPLE);
         glDepthFunc(GL_LEQUAL);
         glClearColor(0.2f, 0.2f, 0.2f, 1);
 
@@ -84,8 +94,9 @@ public class Renderer {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_SAMPLES, 16);
 
-        window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "core.rendering.Renderer", NULL, NULL);
+        window = glfwCreateWindow(Consts.WINDOW_WIDTH, Consts.WINDOW_HEIGHT, "core.rendering.Renderer", NULL, NULL);
         if (window == NULL) throw new RuntimeException("Failed to create the GLFW window");
 
         // Center window
@@ -115,9 +126,13 @@ public class Renderer {
         glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallback() {
             @Override
             public void invoke(long window, int width, int height) {
-                glViewport(0,0,width, height);
-                cam.setPerspective((float)width/(float)height);
+                glViewport(0, 0, width, height);
+                cam.setPerspective((float) width / (float) height);
             }
+        });
+
+        glfwSetScrollCallback(window, (GLFWScrollCallbackI) (window, x, y) -> {
+
         });
     }
 
@@ -125,14 +140,16 @@ public class Renderer {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
-        for(GameObject obj : scene.getObjects()){
+        for (GameObject obj : scene.getObjects()) {
+            if(!(obj instanceof RenderObject)) continue;
+            RenderObject r = (RenderObject) obj;
             int v = glGenBuffers();
             int e = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, v);
-            glBufferData(GL_ARRAY_BUFFER, obj.getMesh().getVerticesFloats(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, r.getMesh().getVerticesFloats(), GL_STATIC_DRAW);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, e);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getMesh().getIndices(), GL_STATIC_DRAW);
-            bm.load(v, e, obj);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, r.getMesh().getIndices(), GL_STATIC_DRAW);
+            bm.load(v, e, r);
         }
     }
 
@@ -178,9 +195,12 @@ public class Renderer {
         int mvLoc = glGetUniformLocation(program, "mvMat");
         int colorLoc = glGetUniformLocation(program, "color");
 
+        // Update camera view
+        cam.lookAt(cam.getTransform().getPosition().add(cameraDirection));
+
         // Create perspective and view matrices
         Matrix4f pMat = cam.getPerspective();
-        Matrix4f vMat = cam.lookAt(new Vector3f(0, 0, -1));
+        Matrix4f vMat = cam.getView();
 
         // Set shader perspective uniform
         FloatBuffer pBuf = BufferUtils.createFloatBuffer(16);
@@ -212,7 +232,5 @@ public class Renderer {
         // V-sync and key events!
         glfwSwapBuffers(window);
         glfwPollEvents();
-
-
     }
 }

@@ -31,7 +31,7 @@ public class Transform {
     }
 
     public void rotate(float deg, float x, float y, float z){
-        rotation.rotateAxis(deg, x, y, z);
+        rotation.rotateAxis((float)Math.toRadians(deg), x, y, z);
     }
 
     public Vector3f getPosition() {

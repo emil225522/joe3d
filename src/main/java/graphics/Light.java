@@ -1,4 +1,4 @@
-package core.lights;
+package graphics;
 
 import core.Transform;
 

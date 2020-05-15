@@ -1,4 +1,4 @@
-package core.lights;
+package graphics;
 
 public class PositionalLight extends Light {
     float[] diffuse;

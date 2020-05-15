@@ -1,9 +1,7 @@
-package core.geometry;
+package graphics;
 
-import core.Material;
 import org.joml.Vector3f;
 
-import java.awt.*;
 import java.util.Arrays;
 
 public class Mesh {

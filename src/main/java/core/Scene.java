@@ -1,29 +1,50 @@
 package core;
 
+import graphics.Camera;
+
 import java.util.*;
 
 public class Scene {
-    private List<GameObject> renderObjects;
-    private Camera mainCamera;
+    private List<GameObject> objects;
 
-    public Scene(Camera camera){
-        this.mainCamera = camera;
-        renderObjects = new ArrayList<>();
+    /**
+     * Creates a new, empty scene. Adds the camera to the scene.
+     * @param camera the main camera of the scene.
+     */
+    public Scene(GameObject camera){
+        objects = new ArrayList<>();
+        objects.add(camera);
     }
 
-    public void add(GameObject ro){
-        renderObjects.add(ro);
+    /**
+     * Adds a game object to the scene.
+     * @param obj the game object to add.
+     */
+    public void add(GameObject obj){
+        objects.add(obj);
     }
 
-    public void remove(GameObject ro){
-        renderObjects.remove(ro);
+    /**
+     * Removes a game object from the scene.
+     * @param obj the game object to remove.
+     */
+    public void remove(GameObject obj){
+        objects.remove(obj);
     }
 
+    /**
+     * Retrieves all objects in the scene as a list.
+     * @return a list containing all objects in the scene.
+     */
     public Collection<GameObject> getObjects() {
-        return renderObjects;
+        return objects;
     }
 
+    /**
+     * Gets a reference to the main camera of the scene.
+     * @return the main camera of the scene.
+     */
     public Camera getMainCamera() {
-        return mainCamera;
+        return (Camera) objects.get(0);
     }
 }

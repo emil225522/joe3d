@@ -1,17 +1,14 @@
 package core;
 
-import core.geometry.Mesh;
+import graphics.Material;
+import graphics.Mesh;
 import org.joml.Matrix4f;
 
-public class GameObject {
-    Transform transform;
-    Mesh mesh;
-    Material material;
+public abstract class GameObject {
+    protected Transform transform;
 
-    public GameObject(Mesh mesh){
+    public GameObject(){
         this.transform = new Transform();
-        this.mesh = mesh;
-        this.material = new Material();
     }
 
     public Matrix4f getModelMatrix(){
@@ -22,15 +19,7 @@ public class GameObject {
         return m;
     }
 
-    public Mesh getMesh(){
-        return mesh;
-    }
-
     public Transform getTransform() {
         return transform;
-    }
-
-    public Material getMaterial() {
-        return material;
     }
 }

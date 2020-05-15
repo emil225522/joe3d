@@ -1,8 +1,6 @@
-package core.graphics;
+package graphics;
 
 import core.GameObject;
-import core.Material;
-import core.geometry.Mesh;
 import org.joml.Matrix4f;
 
 public class BufferInfo {
@@ -13,7 +11,7 @@ public class BufferInfo {
     private Material material;
     private Matrix4f modelMatrix;
 
-    public BufferInfo(int vbo, int ebo, GameObject obj){
+    public BufferInfo(int vbo, int ebo, RenderObject obj){
         this.vbo = vbo;
         this.ebo = ebo;
         this.vertexBuffer = obj.getMesh().getVerticesFloats();
