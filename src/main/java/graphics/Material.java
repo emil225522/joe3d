@@ -2,7 +2,10 @@ package graphics;
 
 import java.awt.*;
 
-public class Material {
+/**
+ * A material class, describing materialistic properties such as color, shininess etc.
+ */
+public class Material implements Cloneable {
     float[] color;
 
     /**
@@ -44,5 +47,9 @@ public class Material {
         if(color.length < 3 || color.length > 4) throw new IllegalArgumentException("The color argument needs to consist of 3 or 4 float values.");
         if(color.length == 4) this.color = color;
         else this.color = new float[]{color[0], color[1], color[2], 1.0f};
+    }
+
+    public Material clone(){
+        return new Material(color);
     }
 }

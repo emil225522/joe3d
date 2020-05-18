@@ -20,6 +20,9 @@ import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
+/**
+ * A 3D rendering engine.
+ */
 public class Renderer {
     private long window;
     private int program;
@@ -67,6 +70,15 @@ public class Renderer {
         glfwSetErrorCallback(null).free();
     }
 
+    /**
+     * This initializer method does a few things: <br>
+     *     <ul>
+     *      <li>Initializes GLFW and GL capabilities.</li>
+     *      <li>Sets default OpenGL states.</li>
+     *      <li>Sets up vertex and index buffers for all loaded renderable objects</li>
+     *      <li>Creates a shader program.</li>
+     *     </ul>
+     */
     private void init() {
         setupGLFW();
         GL.createCapabilities();
@@ -86,6 +98,9 @@ public class Renderer {
         glUseProgram(program);
     }
 
+    /**
+     * Helper method for setting up GLFW, creating a window and some default hints.
+     */
     private void setupGLFW() {
         // GLFW
         GLFWErrorCallback.createPrint(System.err).set();
@@ -113,6 +128,9 @@ public class Renderer {
         glfwShowWindow(window);
     }
 
+    /**
+     * Sets up callbacks such as key inputs and window actions.
+     */
     private void setupCallbacks() {
         // Setup a key callback
         glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
@@ -136,6 +154,9 @@ public class Renderer {
         });
     }
 
+    /**
+     * Sets up vertex and element (index) buffers for all objects in the scene.
+     */
     private void setupVertices() {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
@@ -149,10 +170,16 @@ public class Renderer {
             glBufferData(GL_ARRAY_BUFFER, r.getMesh().getVerticesFloats(), GL_STATIC_DRAW);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, e);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, r.getMesh().getIndices(), GL_STATIC_DRAW);
-            bm.load(v, e, r);
+            bm.add(r, v, e);
         }
     }
 
+    /**
+     * Creates a shader program with the specified shaders
+     * @param vert the path to a vertex shader
+     * @param frag the path to a fragment shader
+     * @return the program id
+     */
     private int createProgram(String vert, String frag) {
         String vString = Utils.parseText(vert),
                 fString = Utils.parseText(frag);
@@ -187,6 +214,9 @@ public class Renderer {
         return program;
     }
 
+    /**
+     * Meaty method! It renders the frame with all the objects and phew... I won't bother commenting this further as of now...
+     */
     private void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -207,7 +237,7 @@ public class Renderer {
         pMat.get(pBuf);
         glUniformMatrix4fv(pLoc, false, pBuf);
 
-        for (BufferInfo b : bm.getVBOs()) {
+        for (BufferInfo b : bm.getBufferInfos()) {
             Matrix4f mMat = b.getModelMatrix();
             Matrix4f mvMat = new Matrix4f();
             vMat.mul(mMat, mvMat);

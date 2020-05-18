@@ -4,6 +4,9 @@ import graphics.Camera;
 
 import java.util.*;
 
+/**
+ * A 3D scene, capable of holding multiple 3D objects for future rendering.
+ */
 public class Scene {
     private List<GameObject> objects;
 
