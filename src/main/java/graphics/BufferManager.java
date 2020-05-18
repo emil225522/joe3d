@@ -9,7 +9,7 @@ import java.util.List;
 /**
  *  A container class for BufferInfo instances.
  */
-public class BufferManager {    // TODO rather crude solution. Should look into something less memory heavy or even singular VBO solution, once I get the hang of OpenGL
+public class BufferManager {
     List<BufferInfo> bufferInfos;
 
     /**

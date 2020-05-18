@@ -30,9 +30,9 @@ public class Transform {
 
     /**
      * Translates the transform in world space along the x, y and z axes.
-     * @param x
-     * @param y
-     * @param z
+     * @param x the translation along the x-axis.
+     * @param y the translation along the y-axis.
+     * @param z the translation along the z-axis.
      */
     public void translate(float x, float y, float z) {
         position.add(x,y,z);

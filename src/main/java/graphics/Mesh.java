@@ -1,5 +1,6 @@
 package graphics;
 
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.Arrays;
@@ -10,8 +11,23 @@ import java.util.Arrays;
 public class Mesh {
     String name;
     Vector3f[] vertices;
-    int[] indices;
     Vector3f[] normals;
+    Vector2f[] texCoords;
+    int[] indices;
+
+    /**
+     * Creates a new model. Preferably built with the static ModelBuilder class.
+     * @param vertices
+     * @param texCoords
+     * @param normals
+     * @param indices
+     */
+    public Mesh(Vector3f[] vertices, Vector2f[] texCoords, Vector3f[] normals, int[] indices) {
+        this.vertices = vertices;
+        this.texCoords = texCoords;
+        this.normals = normals;
+        this.indices = indices;
+    }
 
     /**
      * Returns the amount of vertices in the mesh.
@@ -35,6 +51,16 @@ public class Mesh {
         return vs;
     }
 
+    public float[] getNormalFloats() {
+        float[] ns = new float[normals.length * 3];
+        for (int i = 0; i < vertices.length; i++) {
+            ns[3*i] = normals[i].x;
+            ns[3*i+1] = normals[i].y;
+            ns[3*i+2] = normals[i].z;
+        }
+        return ns;
+    }
+
     /**
      * Returns a copy of all indices, to use with OpenGL element draw methods.
      * @return an array containing all indices.
@@ -55,4 +81,6 @@ public class Mesh {
     public int hashCode() {
         return Arrays.hashCode(vertices);
     }
+
+
 }

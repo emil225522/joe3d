@@ -1,5 +1,6 @@
 package graphics;
 
+import core.Camera;
 import core.GameObject;
 import core.Scene;
 import org.joml.Vector3f;
@@ -27,16 +28,16 @@ public class Renderer {
     private long window;
     private int program;
 
-    final String VERT = Paths.SHADERS + "triangles.vert";
-    final String FRAG = Paths.SHADERS + "triangles.frag";
+    private final String VERT = Paths.SHADERS + "triangles.vert";
+    private final String FRAG = Paths.SHADERS + "triangles.frag";
 
     // Buffers and containers for such stuff
-    int vao;
-    BufferManager bm;
+    private int vao;
+    private BufferManager bm;
 
     // Abstract objects
-    Camera cam;
-    Scene scene;
+    private Camera cam;
+    private Scene scene;
     private Vector3fc cameraDirection = new Vector3f(0,0,-1);
 
     /**
@@ -92,7 +93,7 @@ public class Renderer {
         glDepthFunc(GL_LEQUAL);
         glClearColor(0.2f, 0.2f, 0.2f, 1);
 
-        setupVertices();
+        setupBuffers();
 
         program = createProgram(VERT, FRAG);
         glUseProgram(program);
@@ -157,10 +158,10 @@ public class Renderer {
     /**
      * Sets up vertex and element (index) buffers for all objects in the scene.
      */
-    private void setupVertices() {
+    private void setupBuffers() {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
-
+        
         for (GameObject obj : scene.getObjects()) {
             if(!(obj instanceof RenderObject)) continue;
             RenderObject r = (RenderObject) obj;
@@ -253,13 +254,17 @@ public class Renderer {
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
             glEnableVertexAttribArray(0);
 
+            glBindBuffer(GL_ARRAY_BUFFER, b.getNBO());
+            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+            glEnableVertexAttribArray(1);
+
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, b.getEBO());
 
             // Draw the vertex buffers!
             glDrawElements(GL_TRIANGLES, b.getIndices().length, GL_UNSIGNED_INT, 0);
         }
 
-        // V-sync and key events!
+        // V-sync and callback events!
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

@@ -40,7 +40,7 @@ This repo uses _Git_ for versioning and is hosted on [GitHub](https://github.com
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the GNU GPLv3 License - see the [LICENSE](LICENSE.md) file for details.
 
 ## Acknowledgments
 

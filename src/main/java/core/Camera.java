@@ -1,4 +1,4 @@
-package graphics;
+package core;
 
 import core.GameObject;
 import org.joml.Matrix4f;

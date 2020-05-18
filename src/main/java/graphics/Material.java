@@ -7,6 +7,7 @@ import java.awt.*;
  */
 public class Material implements Cloneable {
     float[] color;
+    float shininess;
 
     /**
      * Creates a new material with a default, grey color.

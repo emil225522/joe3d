@@ -1,13 +1,13 @@
 package graphics;
 
-import core.GameObject;
 import org.joml.Matrix4f;
 
 /**
  * A helper class containing buffer info for a renderable object.
  */
-public class BufferInfo {
+public class BufferInfo { // TODO rather crude solution. Should look into something less memory heavy or even singular EBO and VBO solution, once I get the hang of OpenGL
     private int vbo;
+    private int nbo;
     private int ebo;
     private int[] indices;
     private Material material;
@@ -33,6 +33,14 @@ public class BufferInfo {
      */
     public int getVBO() {
         return vbo;
+    }
+
+    /**
+     * Gets the normals buffer id
+     * @return normals buffer id
+     */
+    public int getNBO() {
+        return nbo;
     }
 
     /**

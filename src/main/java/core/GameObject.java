@@ -1,7 +1,5 @@
 package core;
 
-import graphics.Material;
-import graphics.Mesh;
 import org.joml.Matrix4f;
 
 /**
