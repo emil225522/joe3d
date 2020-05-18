@@ -5,6 +5,7 @@ import core.GameObject;
 import core.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import utility.*;
 
@@ -33,12 +34,15 @@ public class Renderer {
 
     // Buffers and containers for such stuff
     private int vao;
-    private BufferManager bm;
+    private RenderManager rm;
 
     // Abstract objects
     private Camera cam;
     private Scene scene;
-    private Vector3fc cameraDirection = new Vector3f(0,0,-1);
+    private Vector3fc cameraDirection = new Vector3f(0, 0, -1);
+
+    // TODO remove shader testing light
+    PositionalLight light = new PositionalLight();
 
     /**
      * Creates an OpenGL 3D renderer, operating in a GLFW-managed window. Throws exception if the scene has no main camera.
@@ -52,7 +56,7 @@ public class Renderer {
             throw new NullPointerException("Unable to find a main camera in the scene.");
         }
         this.scene = scene;
-        this.bm = new BufferManager();
+        this.rm = new RenderManager();
     }
 
     /**
@@ -73,12 +77,12 @@ public class Renderer {
 
     /**
      * This initializer method does a few things: <br>
-     *     <ul>
-     *      <li>Initializes GLFW and GL capabilities.</li>
-     *      <li>Sets default OpenGL states.</li>
-     *      <li>Sets up vertex and index buffers for all loaded renderable objects</li>
-     *      <li>Creates a shader program.</li>
-     *     </ul>
+     * <ul>
+     *  <li>Initializes GLFW and GL capabilities.</li>
+     *  <li>Sets default OpenGL states.</li>
+     *  <li>Sets up vertex and index buffers for all loaded renderable objects</li>
+     *  <li>Creates a shader program.</li>
+     * </ul>
      */
     private void init() {
         setupGLFW();
@@ -161,22 +165,26 @@ public class Renderer {
     private void setupBuffers() {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
-        
+
         for (GameObject obj : scene.getObjects()) {
-            if(!(obj instanceof RenderObject)) continue;
+            if (!(obj instanceof RenderObject)) continue;
             RenderObject r = (RenderObject) obj;
             int v = glGenBuffers();
-            int e = glGenBuffers();
+            int t = glGenBuffers();
+            int n = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, v);
-            glBufferData(GL_ARRAY_BUFFER, r.getMesh().getVerticesFloats(), GL_STATIC_DRAW);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, e);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, r.getMesh().getIndices(), GL_STATIC_DRAW);
-            bm.add(r, v, e);
+            glBufferData(GL_ARRAY_BUFFER, r.getMesh().getVertexPositions(), GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, t);
+            glBufferData(GL_ARRAY_BUFFER, r.getMesh().getVertexTexCoords(), GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, n);
+            glBufferData(GL_ARRAY_BUFFER, r.getMesh().getVertexNormals(), GL_STATIC_DRAW);
+            rm.add(r, v, t, n);
         }
     }
 
     /**
      * Creates a shader program with the specified shaders
+     *
      * @param vert the path to a vertex shader
      * @param frag the path to a fragment shader
      * @return the program id
@@ -222,9 +230,12 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Get shader uniforms
-        int pLoc = glGetUniformLocation(program, "pMat");
-        int mvLoc = glGetUniformLocation(program, "mvMat");
-        int colorLoc = glGetUniformLocation(program, "color");
+        int proj_mat_loc = glGetUniformLocation(program, "proj_mat");
+        int mv_mat_loc = glGetUniformLocation(program, "mv_mat");
+        int n_mat_loc = glGetUniformLocation(program, "n_mat");
+        int Mcolor = glGetUniformLocation(program, "material.color");
+        int MshiLoc = glGetUniformLocation(program, "material.shininess");
+
 
         // Update camera view
         cam.lookAt(cam.getTransform().getPosition().add(cameraDirection));
@@ -233,39 +244,71 @@ public class Renderer {
         Matrix4f pMat = cam.getPerspective();
         Matrix4f vMat = cam.getView();
 
-        // Set shader perspective uniform
-        FloatBuffer pBuf = BufferUtils.createFloatBuffer(16);
-        pMat.get(pBuf);
-        glUniformMatrix4fv(pLoc, false, pBuf);
+        // Install lights
+        light.getTransform().translate(6, 6, 6);
+        installLights(vMat);
 
-        for (BufferInfo b : bm.getBufferInfos()) {
-            Matrix4f mMat = b.getModelMatrix();
+        // Set shader perspective uniform
+        glUniformMatrix4fv(proj_mat_loc, false, pMat.get(new float[16]));
+
+        for (RenderInfo r : rm.getRenderInfos()) {
+            Matrix4f mMat = r.getModelMatrix();
             Matrix4f mvMat = new Matrix4f();
             vMat.mul(mMat, mvMat);
+            Material material = r.getMaterial();
 
-            // Set modelview shader uniform
-            FloatBuffer mvBuf = BufferUtils.createFloatBuffer(16);
-            mvMat.get(mvBuf);
-            glUniformMatrix4fv(mvLoc, false, mvBuf);
-            glUniform4fv(colorLoc, b.getMaterial().getColor());
+            // Set per model shader uniform
+            glUniformMatrix4fv(mv_mat_loc, false, mvMat.get(new float[16]));
+            glUniformMatrix4fv(n_mat_loc, false, mvMat.invert().transpose().get(new float[16]));
+            glProgramUniform4fv(program, Mcolor, material.getColor());
+            glProgramUniform1f(program, MshiLoc, material.getShininess());
 
-            // Bind buffers and enable shader variables
-            glBindBuffer(GL_ARRAY_BUFFER, b.getVBO());
+            // Set layout variables in shaders
+            // Positions
+            glBindBuffer(GL_ARRAY_BUFFER, r.getVBO());
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
             glEnableVertexAttribArray(0);
-
-            glBindBuffer(GL_ARRAY_BUFFER, b.getNBO());
-            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+            // Tex coords
+            glBindBuffer(GL_ARRAY_BUFFER, r.getTBO());
+            glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
             glEnableVertexAttribArray(1);
-
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, b.getEBO());
+            // Normals
+            glBindBuffer(GL_ARRAY_BUFFER, r.getNBO());
+            glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+            glEnableVertexAttribArray(2);
 
             // Draw the vertex buffers!
-            glDrawElements(GL_TRIANGLES, b.getIndices().length, GL_UNSIGNED_INT, 0);
+            glDrawArrays(GL_TRIANGLES, 0, r.getNumVertex());
         }
 
         // V-sync and callback events!
         glfwSwapBuffers(window);
         glfwPollEvents();
+    }
+
+    private void installLights(Matrix4f vMat) {
+        // convert light’s position to view space, and save it in a float array
+        float x = light.getTransform().getPosition().x;
+        float y = light.getTransform().getPosition().y;
+        float z = light.getTransform().getPosition().z;
+        Vector4f lightP = new Vector4f(x, y, z, 1);
+        Vector4f lightPv = lightP.mul(vMat);
+        float[] viewspaceLightPos = new float[]{lightPv.x, lightPv.y, lightPv.z};
+
+        // set the current globalAmbient settings
+        int globalAmbLoc = glGetUniformLocation(program, "globalAmbient");
+        glProgramUniform4fv(program, globalAmbLoc, light.globalAmbient);
+
+        // get the locations of the light and material fields in the shader
+        int ambLoc = glGetUniformLocation(program, "light.ambient");
+        int diffLoc = glGetUniformLocation(program, "light.diffuse");
+        int specLoc = glGetUniformLocation(program, "light.specular");
+        int posLoc = glGetUniformLocation(program, "light.position");
+
+        // set the uniform light and material values in the shader
+        glProgramUniform4fv(program, ambLoc, light.getAmbient());
+        glProgramUniform4fv(program, diffLoc, light.getDiffuse());
+        glProgramUniform4fv(program, specLoc, light.getSpecular());
+        glProgramUniform3fv(program, posLoc, viewspaceLightPos);
     }
 }

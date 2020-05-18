@@ -2,6 +2,7 @@ package utility;
 
 import graphics.Mesh;
 
+import graphics.Vertex;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -13,10 +14,15 @@ import java.util.Scanner;
 
 public class MeshBuilder {
     public static Mesh build(String obj) {
+        boolean hasTexCoord = false;
+        boolean hasNormal = false;
+
         List<Vector3f> vList = new ArrayList<>();
         List<Vector2f> tList = new ArrayList<>();
         List<Vector3f> nList = new ArrayList<>();
-        List<Integer> iList = new ArrayList<>();
+        List<Integer> vertexIndexList = new ArrayList<>();
+        List<Integer> texCoordIndexList = new ArrayList<>();
+        List<Integer> normalIndexList = new ArrayList<>();
 
         try {
             Scanner scan = new Scanner(new File(obj));
@@ -31,39 +37,36 @@ public class MeshBuilder {
                 if (isVertexLine) {
                     Vector3f v = parseVertexLine(parts);
                     vList.add(v);
-                }
-
-                else if (isTexCoordLine){
+                } else if (isTexCoordLine) {
                     Vector2f tc = parseTexCoordLine(parts);
                     tList.add(tc);
-                }
-                // normals
-                else if (isNormalLine){
-                    Vector3f n = parseVertexLine(parts);
+                } else if (isNormalLine) {
+                    Vector3f n = parseNormalLine(parts);
                     nList.add(n);
-                }
-                // indices
-                else if (isFaceLine) {
-                    // vertex strings
-                    String vxs = parts[1].split("/")[0];
-                    String vys = parts[2].split("/")[0];
-                    String vzs = parts[3].split("/")[0];
-                    int i1 = Integer.parseInt(vxs) - 1;
-                    int i2 = Integer.parseInt(vys) - 1;
-                    int i3 = Integer.parseInt(vzs) - 1;
-                    iList.add(i1);
-                    iList.add(i2);
-                    iList.add(i3);
+                } else if (isFaceLine) {
+                    // Determine what data line has
+                    String[] check = parts[1].split("/");
+                    hasTexCoord = check.length > 1 && !check[1].equals("");
+                    hasNormal = check.length == 3;
 
-//                    // texel strings TODO actually add indices
-//                    String txs = parts[1].split("/")[1];
-//                    String tys = parts[2].split("/")[1];
-//                    String tzs = parts[3].split("/")[1];
-//
-//                    // normal strings TODO actually add indices
-//                    String nxs = parts[1].split("/")[2];
-//                    String nys = parts[2].split("/")[2];
-//                    String nzs = parts[3].split("/")[2];
+                    // vertex indices in groups of three
+                    int[] vIndices = parseVertexIndices(parts);
+                    vertexIndexList.add(vIndices[0]);
+                    vertexIndexList.add(vIndices[1]);
+                    vertexIndexList.add(vIndices[2]);
+
+                    if (hasTexCoord) {
+                        int[] tIndices = parseTexCoordIndices(parts);
+                        texCoordIndexList.add(tIndices[0]);
+                        texCoordIndexList.add(tIndices[1]);
+                    }
+
+                    if (hasNormal) {
+                        int[] nIndices = parseNormalIndices(parts);
+                        normalIndexList.add(nIndices[0]);
+                        normalIndexList.add(nIndices[1]);
+                        normalIndexList.add(nIndices[2]);
+                    }
                 }
             }
         } catch (FileNotFoundException e) {
@@ -71,19 +74,26 @@ public class MeshBuilder {
             System.exit(1);
         }
 
-        // Build the model once finished parsing
-        Vector3f[] vertices = new Vector3f[vList.size()];
-        for (int i = 0; i < vList.size(); i++) {
-            vertices[i] = vList.get(i);
-        }
+        Vertex[] vertices = new Vertex[vertexIndexList.size()];
+        for (int i = 0; i < vertexIndexList.size(); i++) {
+            Vector3f position;
+            Vector2f texCoord = null;
+            Vector3f normal = null;
 
-        int[] indices = new int[iList.size()];
-        for (int i = 0; i < iList.size(); i++) {
-            indices[i] = iList.get(i);
-        }
+            int vIndex = vertexIndexList.get(i);
+            position = vList.get(vIndex);
 
-        // TODO return the built model
-        return new Mesh(vertices, null, null, indices);
+            if (hasTexCoord) {
+                int tIndex = texCoordIndexList.get(i);
+                texCoord = tList.get(tIndex);
+            }
+            if (hasNormal) {
+                int nIndex = normalIndexList.get(i);
+                normal = nList.get(nIndex);
+            }
+            vertices[i] = new Vertex(position, texCoord, normal);
+        }
+        return new Mesh(vertices);
     }
 
     private static Vector3f parseVertexLine(String[] parts) {
@@ -96,10 +106,38 @@ public class MeshBuilder {
     private static Vector2f parseTexCoordLine(String[] parts) {
         float x = Float.parseFloat(parts[1]);
         float y = Float.parseFloat(parts[2]);
-        return new Vector2f(x,y);
+        return new Vector2f(x, y);
     }
 
     private static Vector3f parseNormalLine(String[] parts) {
         return parseVertexLine(parts);
+    }
+
+    private static int[] parseVertexIndices(String[] parts) {
+        String indexString1 = parts[1].split("/")[0];
+        String indexString2 = parts[2].split("/")[0];
+        String indexString3 = parts[3].split("/")[0];
+        int index1 = Integer.parseInt(indexString1) - 1;
+        int index2 = Integer.parseInt(indexString2) - 1;
+        int index3 = Integer.parseInt(indexString3) - 1;
+        return new int[]{index1, index2, index3};
+    }
+
+    private static int[] parseTexCoordIndices(String[] parts) {
+        String indexString1 = parts[1].split("/")[1];
+        String indexString2 = parts[2].split("/")[1];
+        int index1 = Integer.parseInt(indexString1) - 1;
+        int index2 = Integer.parseInt(indexString2) - 1;
+        return new int[]{index1, index2};
+    }
+
+    private static int[] parseNormalIndices(String[] parts) {
+        String indexString1 = parts[1].split("/")[2];
+        String indexString2 = parts[2].split("/")[2];
+        String indexString3 = parts[3].split("/")[2];
+        int index1 = Integer.parseInt(indexString1) - 1;
+        int index2 = Integer.parseInt(indexString2) - 1;
+        int index3 = Integer.parseInt(indexString3) - 1;
+        return new int[]{index1, index2, index3};
     }
 }

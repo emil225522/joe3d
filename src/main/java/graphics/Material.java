@@ -6,7 +6,7 @@ import java.awt.*;
  * A material class, describing materialistic properties such as color, shininess etc.
  */
 public class Material implements Cloneable {
-    float[] color;
+    private float[] color;
     float shininess;
 
     /**
@@ -14,14 +14,7 @@ public class Material implements Cloneable {
      */
     public Material(){
         color = new float[]{0.5f,0.5f,0.5f,1.0f};
-    }
-
-    /**
-     * Creates a new customly colored material.
-     * @param color an array of values specifying the RGB (or RGBA) channels of the color. If not set, alpha defaults to 1.0f.
-     */
-    public Material(float[] color){
-        setColor(color);
+        shininess = 1;
     }
 
     /**
@@ -29,7 +22,17 @@ public class Material implements Cloneable {
      * @param color an AWT color, needs no further introduction, I gather.
      */
     public Material(Color color){
-        this.color = color.getRGBComponents(null);
+        this(color.getRGBComponents(null), 1);
+    }
+
+    /**
+     * Creates a new customly colored material.
+     * @param color an array of values specifying the RGB (or RGBA) channels of the color. If not set, alpha defaults to 1.0f.
+     * @param shininess the shininess factor.
+     */
+    public Material(float[] color, float shininess){
+        setColor(color);
+        this.shininess = shininess;
     }
 
     /**
@@ -50,7 +53,11 @@ public class Material implements Cloneable {
         else this.color = new float[]{color[0], color[1], color[2], 1.0f};
     }
 
+    public float getShininess() {
+        return shininess;
+    }
+
     public Material clone(){
-        return new Material(color);
+        return new Material(color, shininess);
     }
 }

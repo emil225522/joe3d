@@ -5,10 +5,11 @@ import org.joml.Matrix4f;
 /**
  * A helper class containing buffer info for a renderable object.
  */
-public class BufferInfo { // TODO rather crude solution. Should look into something less memory heavy or even singular EBO and VBO solution, once I get the hang of OpenGL
+public class RenderInfo { // TODO rather crude solution. Should look into something less memory heavy or even singular EBO and VBO solution, once I get the hang of OpenGL
     private int vbo;
+    private int tbo;
     private int nbo;
-    private int ebo;
+    private int numVertex;
     private int[] indices;
     private Material material;
     private Matrix4f modelMatrix;
@@ -17,12 +18,12 @@ public class BufferInfo { // TODO rather crude solution. Should look into someth
      * Creates a new container, holding the material and model matrix of a renderable object. Also, it stores the associated index buffer and vertex buffer IDs.
      * @param obj a renderable object
      * @param vbo the vertex buffer ID
-     * @param ebo the index buffer ID
      */
-    public BufferInfo(RenderObject obj, int vbo, int ebo) {
+    public RenderInfo(RenderObject obj, int vbo, int tbo, int nbo) {
         this.vbo = vbo;
-        this.ebo = ebo;
-        this.indices = obj.getMesh().getIndices();
+        this.tbo = tbo;
+        this.nbo = nbo;
+        this.numVertex = obj.getMesh().vertexCount();
         this.material = obj.getMaterial();
         this.modelMatrix = obj.getModelMatrix();
     }
@@ -35,28 +36,20 @@ public class BufferInfo { // TODO rather crude solution. Should look into someth
         return vbo;
     }
 
-    /**
-     * Gets the normals buffer id
-     * @return normals buffer id
-     */
-    public int getNBO() {
-        return nbo;
+    public int getTBO() {
+        return tbo;
     }
 
-    /**
-     * Gets the index buffer id
-     * @return index buffer id
-     */
-    public int getEBO() {
-        return ebo;
+    public int getNBO() {
+        return nbo;
     }
 
     /**
      * Retrieves a copy of the indices.
      * @return an integer array holding all indices.
      */
-    public int[] getIndices() {
-        return indices.clone();
+    public int getNumVertex() {
+        return numVertex;
     }
 
     /**

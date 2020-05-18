@@ -9,24 +9,14 @@ import java.util.Arrays;
  * An generic 3D mesh class. Provides basic functionality for concrete 3D primitives and models.
  */
 public class Mesh {
-    String name;
-    Vector3f[] vertices;
-    Vector3f[] normals;
-    Vector2f[] texCoords;
-    int[] indices;
+    Vertex[] vertices;
 
     /**
      * Creates a new model. Preferably built with the static ModelBuilder class.
      * @param vertices
-     * @param texCoords
-     * @param normals
-     * @param indices
      */
-    public Mesh(Vector3f[] vertices, Vector2f[] texCoords, Vector3f[] normals, int[] indices) {
+    public Mesh(Vertex[] vertices) {
         this.vertices = vertices;
-        this.texCoords = texCoords;
-        this.normals = normals;
-        this.indices = indices;
     }
 
     /**
@@ -41,32 +31,40 @@ public class Mesh {
      * Returns a copy of all vertices. Vertices are stored in a float array to use with OpenGL draw methods.
      * @return an array containing all mesh vertices.
      */
-    public float[] getVerticesFloats() {
+    public float[] getVertexPositions() {
         float[] vs = new float[vertices.length * 3];
         for (int i = 0; i < vertices.length; i++) {
-            vs[3*i] = vertices[i].x;
-            vs[3*i+1] = vertices[i].y;
-            vs[3*i+2] = vertices[i].z;
+            Vector3f position = vertices[i].getPosition();
+            vs[3*i] = position.x;
+            vs[3*i+1] = position.y;
+            vs[3*i+2] = position.z;
         }
         return vs;
     }
 
-    public float[] getNormalFloats() {
-        float[] ns = new float[normals.length * 3];
+    public float[] getVertexTexCoords() {
+        float[] ts = new float[vertices.length * 2];
         for (int i = 0; i < vertices.length; i++) {
-            ns[3*i] = normals[i].x;
-            ns[3*i+1] = normals[i].y;
-            ns[3*i+2] = normals[i].z;
+            Vector2f texCoord = vertices[i].getTexCoord();
+            if(texCoord != null){
+                ts[2*i] = texCoord.x;
+                ts[2*i+1] = texCoord.y;
+            }
         }
-        return ns;
+        return ts;
     }
 
-    /**
-     * Returns a copy of all indices, to use with OpenGL element draw methods.
-     * @return an array containing all indices.
-     */
-    public int[] getIndices() {
-        return indices.clone();
+    public float[] getVertexNormals() {
+        float[] ns = new float[vertices.length * 3];
+        for (int i = 0; i < vertices.length; i++) {
+            Vector3f normal = vertices[i].getNormal();
+            if(normal != null) {
+                ns[3*i] = normal.x;
+                ns[3*i+1] = normal.y;
+                ns[3*i+2] = normal.z;
+            }
+        }
+        return ns;
     }
 
     @Override
@@ -81,6 +79,5 @@ public class Mesh {
     public int hashCode() {
         return Arrays.hashCode(vertices);
     }
-
 
 }
