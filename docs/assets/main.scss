@@ -2,6 +2,7 @@
 ---
 
 
+
 $background-color: #1d1d1d;
 /* a dark, off-black for the bg */
 $text-color: #e6e6e6;
@@ -12,6 +13,14 @@ $grey-color-dark: #adadad;
 /* such as the site title in the header, visited */
 
 @import "{{ site.theme }}";
+
+a {
+    color: #998e7a;
+}
+
+a:visited {
+    color: #ffd781;
+}
 
 .highlight {
     background: #1d1d1d;
