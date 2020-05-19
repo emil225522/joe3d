@@ -22,9 +22,7 @@ title: Joe3D
 author: Andreas Nilsson
 email: nilsiker94@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Joe3D is a custom 3D game engine developed by a Swedish computer science 
-  student based in Helsingborg. It is written in Java using the OpenGL API 
-  for rendering.
+  A 3D game engine written in Java using LWJGL.
 baseurl: "/joe3d" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: Nilsiker
