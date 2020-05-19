@@ -7,6 +7,9 @@ categories: general
 #   {% highlight <lang>%}
 #   {% endhighlight %}
 ---
+
+![Ook!]({{site.baseurl}}/assets/img/suzannes.png)
+
 If you found your way here it looks like you've stumbled upon the project page for my game engine, Joe3D!
 
 So, what's the goal? What's the deal? Why bother with a game engine, you might ask? Well, graphics are kinda cool and I wanna know how to do them, that's why!
@@ -17,9 +20,7 @@ The plan is to share my design ideas, my code and just general thoughts about th
 
 So, for now, I'll just leave you with this screenshot and code snippet of some Suzannes enjoying their time in Joe3D!
 
-`Take care, y'all!`
-
-![Ook!](assets/imgs/suzannes.png)
+Take care, y'all!
 
 {% highlight java %}
 public static void main(String[] args) {

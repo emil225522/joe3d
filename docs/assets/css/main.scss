@@ -1,0 +1,78 @@
+--- 
+# Only the main Sass file needs front matter (the dashes are enough) sitemap: exclude: 'yes'
+--- 
+
+@charset "utf-8";
+
+@import "mixins";
+@import "variables";
+
+@import "base";
+
+@import "header";
+@import "articles";
+@import "titles";
+@import "hero";
+
+@import "components";
+
+@import "notices";
+@import "blockquote";
+@import "table";
+@import "code";
+
+@import "404";
+@import "jekyll-github";
+@import "pagination";
+@import "footer";
+
+@import "icons";
+
+.highlighter-rouge {
+  font-size: 20px;
+  font-family: "Rubik",
+  -apple-system,
+  BlinkMacSystemFont,
+  "Helvetica Neue",
+  sans-serif
+}
+
+.highlight {
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #999999;
+  backface-visibility: visible;
+}
+
+.highlight {
+  margin-top: 30px;
+}
+
+.highlight .n {
+  font-size: 16px;
+  color: var(--text-color);
+  backface-visibility: visible;
+}
+
+.highlight::before {
+  padding: 0;
+  content: "";
+}
+
+pre {
+  margin-top: 0;
+}
+
+pre code {
+  font-family: monospace;
+  font-size: 16px;
+}
+
+.hero-heading h1 {
+  color: var(--post-title) !important;
+}
+
+img {
+    border-radius: 8px;
+}
