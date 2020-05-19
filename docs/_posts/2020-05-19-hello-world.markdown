@@ -9,13 +9,13 @@ categories: general
 ---
 If you found your way here it looks like you've stumbled upon the project page for my game engine, Joe3D!
 
-So, what's the goal? What's the deal? Why another game engine, you might ask? Well, graphics are kinda cool and I wanna know how to do them, that's why!
+So, what's the goal? What's the deal? Why bother with a game engine, you might ask? Well, graphics are kinda cool and I wanna know how to do them, that's why!
 
 But it's not only that. I've dabbled very shallowly in various game engines but I never really felt satisfied not knowing what was going on under the hood. I also realized I'm more interested in the architecture and design of game engines, rather than the games themselves. So here we are. :)
 
 The plan is to share my design ideas, my code and just general thoughts about the process on this dev blog. At the moment there's not too much to talk about. Rest assured, as soon as I've finished up some more skeleton work, we'll dive right into it!
 
-So, for now, I'll just you with this screenshot and code snippet of some Suzannes enjoying their time in Joe3D!
+So, for now, I'll just leave you with this screenshot and code snippet of some Suzannes enjoying their time in `Joe3D`!
 
 Take care, y'all!
 
