@@ -1,6 +1,6 @@
 # joe3D
 
-A Java Open 3D Engine, JavaOpEngine... 3D... Err... Just joe3d, for now!
+Joe3D is a custom 3D game engine developed by a Swedish computer science student based in Helsingborg. It is written in Java using the OpenGL API for rendering.
 
 ## Getting started
 
