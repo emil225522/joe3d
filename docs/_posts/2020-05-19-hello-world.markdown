@@ -15,9 +15,9 @@ But it's not only that. I've dabbled very shallowly in various game engines but 
 
 The plan is to share my design ideas, my code and just general thoughts about the process on this dev blog. At the moment there's not too much to talk about. Rest assured, as soon as I've finished up some more skeleton work, we'll dive right into it!
 
-So, for now, I'll just leave you with this screenshot and code snippet of some Suzannes enjoying their time in `Joe3D`!
+So, for now, I'll just leave you with this screenshot and code snippet of some Suzannes enjoying their time in Joe3D!
 
-Take care, y'all!
+`Take care, y'all!`
 
 ![Ook!](assets/imgs/suzannes.png)
 
