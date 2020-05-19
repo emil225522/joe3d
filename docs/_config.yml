@@ -25,7 +25,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   Joe3D is a custom 3D game engine developed by a Swedish computer science 
   student based in Helsingborg. It is written in Java using the OpenGL API 
   for rendering.
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/joe3d" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: Nilsiker
 github_username:  Nilsiker
