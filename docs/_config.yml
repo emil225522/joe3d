@@ -27,9 +27,8 @@ blog:
 # Author info
 author:
   fullname                  : Andreas Nilsson
-  rss                       : true # generate RSS feed and show it's icon in header
+  rss                       : false # generate RSS feed and show it's icon in header
   mail                      : nilsiker94@gmail.com # change to your e-mail address
-  twitter                   : Nilsiker
   github                    : Nilsiker/joe3d
   youtube                   : 
   stackoverflow             : 
