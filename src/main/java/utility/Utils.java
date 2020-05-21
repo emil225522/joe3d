@@ -38,7 +38,7 @@ public class Utils {
         try {
             Scanner scan = new Scanner(new File(filepath));
 
-            while (scan.hasNextLine()) {
+            while (scan.hasNextLine() ) {
                 String line = scan.nextLine();
                 if(line.charAt(0) == '#')
                     continue;
