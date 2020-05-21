@@ -2,11 +2,11 @@ package graphics;
 
 import core.Camera;
 import core.GameObject;
+import core.KeyInput;
 import core.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
-import org.lwjgl.BufferUtils;
 import utility.*;
 
 import org.joml.Matrix4f;
@@ -15,6 +15,9 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import java.nio.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -28,13 +31,15 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class Renderer {
     private long window;
     private int program;
+    KeyInput input = new KeyInput();
 
-    private final String VERT = Paths.SHADERS + "triangles.vert";
-    private final String FRAG = Paths.SHADERS + "triangles.frag";
+    private final String VERT = Const.SHADERS + "bp.vert";
+    private final String FRAG = Const.SHADERS + "bp.frag";
 
     // Buffers and containers for such stuff
     private int vao;
-    private RenderManager rm;
+
+    private List<RenderInfo> renders = new ArrayList<>();
 
     // Abstract objects
     private Camera cam;
@@ -56,7 +61,6 @@ public class Renderer {
             throw new NullPointerException("Unable to find a main camera in the scene.");
         }
         this.scene = scene;
-        this.rm = new RenderManager();
     }
 
     /**
@@ -72,7 +76,7 @@ public class Renderer {
         glfwDestroyWindow(window);
 
         glfwTerminate();
-        glfwSetErrorCallback(null).free();
+        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 
     /**
@@ -85,10 +89,34 @@ public class Renderer {
      * </ul>
      */
     private void init() {
+        // OpenGL and GLFW must-haves
         setupGLFW();
         GL.createCapabilities();
-        setupCallbacks();
 
+        // Setup a key callback
+        glfwSetKeyCallback(window, (window,  key,  scancode,  action,  mods) -> {
+
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
+                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+            else {
+
+                input.read(key, action, mods);
+
+            }
+
+
+        });
+
+        // Window resize callback
+        glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallback() {
+            @Override
+            public void invoke(long window, int width, int height) {
+                glViewport(0, 0, width, height);
+                cam.setPerspective((float) width / (float) height);
+            }
+        });
+
+        // OpenGL states
         glFrontFace(GL_CCW);
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
@@ -97,8 +125,10 @@ public class Renderer {
         glDepthFunc(GL_LEQUAL);
         glClearColor(0.2f, 0.2f, 0.2f, 1);
 
+        // Setup all the vertices!
         setupBuffers();
 
+        // Create shader program
         program = createProgram(VERT, FRAG);
         glUseProgram(program);
     }
@@ -116,7 +146,7 @@ public class Renderer {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_SAMPLES, 16);
 
-        window = glfwCreateWindow(Consts.WINDOW_WIDTH, Consts.WINDOW_HEIGHT, "core.rendering.Renderer", NULL, NULL);
+        window = glfwCreateWindow(Const.WINDOW_WIDTH, Const.WINDOW_HEIGHT, "Joe3D", NULL, NULL);
         if (window == NULL) throw new RuntimeException("Failed to create the GLFW window");
 
         // Center window
@@ -125,6 +155,7 @@ public class Renderer {
             IntBuffer pHeight = stack.mallocInt(1);
             glfwGetWindowSize(window, pWidth, pHeight);
             GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            assert vidmode != null;
             glfwSetWindowPos(window, (vidmode.width() - pWidth.get(0)) / 2, (vidmode.height() - pHeight.get(0)) / 2);
         }
 
@@ -137,26 +168,7 @@ public class Renderer {
      * Sets up callbacks such as key inputs and window actions.
      */
     private void setupCallbacks() {
-        // Setup a key callback
-        glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
-            else if (key == GLFW_KEY_W && action == GLFW_PRESS)
-                ; // TODO add camera moves forward! DEBUG
-        });
 
-        // Window resize callback
-        glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallback() {
-            @Override
-            public void invoke(long window, int width, int height) {
-                glViewport(0, 0, width, height);
-                cam.setPerspective((float) width / (float) height);
-            }
-        });
-
-        glfwSetScrollCallback(window, (GLFWScrollCallbackI) (window, x, y) -> {
-
-        });
     }
 
     /**
@@ -178,7 +190,7 @@ public class Renderer {
             glBufferData(GL_ARRAY_BUFFER, r.getMesh().getVertexTexCoords(), GL_STATIC_DRAW);
             glBindBuffer(GL_ARRAY_BUFFER, n);
             glBufferData(GL_ARRAY_BUFFER, r.getMesh().getVertexNormals(), GL_STATIC_DRAW);
-            rm.add(r, v, t, n);
+            renders.add(new RenderInfo(r, v, t, n));
         }
     }
 
@@ -251,7 +263,7 @@ public class Renderer {
         // Set shader perspective uniform
         glUniformMatrix4fv(proj_mat_loc, false, pMat.get(new float[16]));
 
-        for (RenderInfo r : rm.getRenderInfos()) {
+        for (RenderInfo r : renders) {
             Matrix4f mMat = r.getModelMatrix();
             Matrix4f mvMat = new Matrix4f();
             vMat.mul(mMat, mvMat);
@@ -297,7 +309,7 @@ public class Renderer {
 
         // set the current globalAmbient settings
         int globalAmbLoc = glGetUniformLocation(program, "globalAmbient");
-        glProgramUniform4fv(program, globalAmbLoc, light.globalAmbient);
+        glProgramUniform4fv(program, globalAmbLoc, Light.globalAmbient);
 
         // get the locations of the light and material fields in the shader
         int ambLoc = glGetUniformLocation(program, "light.ambient");

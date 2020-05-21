@@ -1,0 +1,12 @@
+
+# This is a comment
+# An entry is specified as
+# {Message name} {Key} {Modifiers}
+# example: FIRE_GUN G SHIFT
+#   would send the FIRE_GUN message if G was pressed while holding down SHIFT.
+
+
+WALK_FORWARD W
+WALK_LEFT A
+WALK_BACKWARD S
+WALK_RIGHT D
