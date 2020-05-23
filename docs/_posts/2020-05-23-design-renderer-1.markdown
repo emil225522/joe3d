@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Design: Renderer<br>Part 1"
+title:  "Design: Renderer #1"
 date:   2020-05-23 15:18:52 +0200
 categories: general
 # `` highlight
