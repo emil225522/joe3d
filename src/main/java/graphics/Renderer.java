@@ -2,7 +2,7 @@ package graphics;
 
 import core.Camera;
 import core.GameObject;
-import core.KeyInput;
+import control.Input;
 import core.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -24,6 +24,8 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
+import static utility.Const.*;
+import static utility.Utils.*;
 
 /**
  * A 3D rendering engine.
@@ -31,10 +33,10 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class Renderer {
     private long window;
     private int program;
-    KeyInput input = new KeyInput();
+    Input input = new Input();
 
-    private final String VERT = Const.SHADERS + "bp.vert";
-    private final String FRAG = Const.SHADERS + "bp.frag";
+    private final String VERT = SHADERS + "bp.vert";
+    private final String FRAG = SHADERS + "bp.frag";
 
     // Buffers and containers for such stuff
     private int vao;
@@ -70,7 +72,14 @@ public class Renderer {
         init();
 
         while (!glfwWindowShouldClose(window)) {
-            render();
+
+            updateCamera();
+            updateSceneElements();
+
+            renderScene();
+
+            glfwSwapBuffers(window);
+            glfwPollEvents();
         }
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
@@ -78,6 +87,10 @@ public class Renderer {
         glfwTerminate();
         Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
+
+
+
+
 
     /**
      * This initializer method does a few things: <br>
@@ -92,29 +105,8 @@ public class Renderer {
         // OpenGL and GLFW must-haves
         setupGLFW();
         GL.createCapabilities();
+        setupCallbacks();
 
-        // Setup a key callback
-        glfwSetKeyCallback(window, (window,  key,  scancode,  action,  mods) -> {
-
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
-            else {
-
-                input.read(key, action, mods);
-
-            }
-
-
-        });
-
-        // Window resize callback
-        glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallback() {
-            @Override
-            public void invoke(long window, int width, int height) {
-                glViewport(0, 0, width, height);
-                cam.setPerspective((float) width / (float) height);
-            }
-        });
 
         // OpenGL states
         glFrontFace(GL_CCW);
@@ -131,6 +123,14 @@ public class Renderer {
         // Create shader program
         program = createProgram(VERT, FRAG);
         glUseProgram(program);
+    }
+
+    private void updateCamera() {
+
+    }
+
+    private void updateSceneElements() {
+
     }
 
     /**
@@ -168,7 +168,24 @@ public class Renderer {
      * Sets up callbacks such as key inputs and window actions.
      */
     private void setupCallbacks() {
+        // Setup a key callback
+        glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
 
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
+                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+            else {
+                input.read(key, action, mods);
+            }
+        });
+
+        // Window resize callback
+        glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallback() {
+            @Override
+            public void invoke(long window, int width, int height) {
+                glViewport(0, 0, width, height);
+                cam.setPerspective((float) width / (float) height);
+            }
+        });
     }
 
     /**
@@ -202,8 +219,8 @@ public class Renderer {
      * @return the program id
      */
     private int createProgram(String vert, String frag) {
-        String vString = Utils.parseText(vert),
-                fString = Utils.parseText(frag);
+        String vString = parseText(vert),
+                fString = parseText(frag);
 
         // Create, assigned source to and compile VERTEX shader. Output errors if present.
         int vShader = glCreateShader(GL_VERTEX_SHADER);
@@ -238,7 +255,7 @@ public class Renderer {
     /**
      * Meaty method! It renders the frame with all the objects and phew... I won't bother commenting this further as of now...
      */
-    private void render() {
+    private void renderScene() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Get shader uniforms
@@ -292,10 +309,6 @@ public class Renderer {
             // Draw the vertex buffers!
             glDrawArrays(GL_TRIANGLES, 0, r.getNumVertex());
         }
-
-        // V-sync and callback events!
-        glfwSwapBuffers(window);
-        glfwPollEvents();
     }
 
     private void installLights(Matrix4f vMat) {

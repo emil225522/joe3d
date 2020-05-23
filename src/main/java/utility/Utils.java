@@ -1,8 +1,5 @@
 package utility;
 
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -33,25 +30,5 @@ public class Utils {
         return string;
     }
 
-    public static Map<Integer, String> parseKeyMap(String filepath){
-        Map<Integer, String> map = new HashMap<>();
-        try {
-            Scanner scan = new Scanner(new File(filepath));
-
-            while (scan.hasNextLine() ) {
-                String line = scan.nextLine();
-                if(line.charAt(0) == '#')
-                    continue;
-
-                String[] parts = line.split(" ");
-                // TODO implement
-            }
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        return null;
-    }
 
 }

@@ -2,9 +2,9 @@ import core.Camera;
 import core.GameObject;
 import core.Scene;
 import graphics.*;
-import utility.Const;
+
 import utility.MeshBuilder;
-import utility.Paths;
+import static utility.Const.*;
 
 import java.awt.*;
 
@@ -13,12 +13,12 @@ import java.awt.*;
  */
 public class App {
     public static void main(String[] args) {
-        Camera camera = new Camera(Const.WINDOW_WIDTH, Const.WINDOW_HEIGHT);
+        Camera camera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
         Scene scene = new Scene(camera);
 
-        GameObject apa1 = new RenderObject(MeshBuilder.build(Const.MODELS + "suzanne.obj"), new Material(Color.pink.darker().darker()));
-        GameObject apa2 = new RenderObject(MeshBuilder.build(Const.MODELS + "monkey.obj"), new Material(Color.pink.darker().darker()));
-        GameObject ball = new RenderObject(MeshBuilder.build(Const.MODELS+"sphere.obj"), new Material(Color.cyan));
+        GameObject apa1 = new RenderObject(MeshBuilder.build(MESHES + "suzanne.obj"), new Material(Color.pink.darker().darker()));
+        GameObject apa2 = new RenderObject(MeshBuilder.build(MESHES + "monkey.obj"), new Material(Color.pink.darker().darker()));
+        GameObject ball = new RenderObject(MeshBuilder.build(MESHES +"sphere.obj"), new Material(Color.cyan));
 
         apa1.getTransform().translate(2, 0, 0);
         apa1.getTransform().rotate(-30, 0, 1, 0);

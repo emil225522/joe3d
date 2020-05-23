@@ -1,8 +1,11 @@
 # This is a comment
 # An entry is specified as
-# {Message name} {Key} {Modifiers}
-# example: FIRE_GUN G SHIFT
-#   would send the FIRE_GUN message if G was pressed while holding down SHIFT.
+# {MSG NAME} {KEY} {MODS}
+# MODS are optional
+# example: FIRE_GUN G
+#
+# CAUTION! empty lines or lines with only spaces are NOT ALLOWED
+#
 WALK_FORWARD W
 WALK_LEFT A
 WALK_BACKWARD S

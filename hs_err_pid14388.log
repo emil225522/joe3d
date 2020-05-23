@@ -19,7 +19,7 @@
 Command Line: -Dfile.encoding=windows-1252 -Duser.country=SE -Duser.language=sv -Duser.variant App
 
 Host: AMD Ryzen 7 1700X Eight-Core Processor         , 16 cores, 15G,  Windows 10 , 64 bit Build 18362 (10.0.18362.778)
-Time: Thu May 14 09:29:37 2020 Västeuropa, sommartid elapsed time: 1 seconds (0d 0h 0m 1s)
+Time: Thu May 14 09:29:37 2020 Vï¿½steuropa, sommartid elapsed time: 1 seconds (0d 0h 0m 1s)
 
 ---------------  T H R E A D  ---------------
 
@@ -502,8 +502,8 @@ Event: 1.419 Thread 0x000001efa395a800 Exception <a 'java/security/PrivilegedAct
 Event: 1.491 Thread 0x000001efa395a800 Implicit null exception at 0x000001efac537e14 to 0x0000000000000000
 
 Events (10 events):
-Event: 1.418 loading class org/lwjgl/system/APIUtil$Encoder
-Event: 1.418 loading class org/lwjgl/system/APIUtil$Encoder done
+Event: 1.418 loading class org/lwjgl/systems/APIUtil$Encoder
+Event: 1.418 loading class org/lwjgl/systems/APIUtil$Encoder done
 Event: 1.419 Executing VM operation: RevokeBias
 Event: 1.419 Executing VM operation: RevokeBias done
 Event: 1.489 loading class org/joml/Runtime
@@ -649,7 +649,7 @@ OS: Windows 10 , 64 bit Build 18362 (10.0.18362.778)
 
 CPU:total 16 (initial active 16) (16 cores per cpu, 2 threads per core) family 23 model 1 stepping 1, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, avx2, aes, clmul, mmxext, 3dnowpref, lzcnt, sse4a, ht, tsc, tscinvbit, tscinv, bmi1, bmi2, adx, sha, fma
 
-Memory: 4k page, system-wide physical 16315M (6348M free)
+Memory: 4k page, systems-wide physical 16315M (6348M free)
 TotalPageFile size 19776M (AvailPageFile size 3264M)
 current process WorkingSet (physical memory assigned to process): 159M, peak: 160M
 current process commit charge ("private bytes"): 454M, peak: 455M

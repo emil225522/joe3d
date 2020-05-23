@@ -126,14 +126,14 @@ standard defined by a recognized standards body, or, in the case of
 interfaces specified for a particular programming language, one that
 is widely used among developers working in that language.
 
-The "System Libraries" of an executable work include anything, other
+The "systems.System Libraries" of an executable work include anything, other
 than the work as a whole, that (a) is included in the normal form of
 packaging a Major Component, but which is not part of that Major
 Component, and (b) serves only to enable use of the work with that
 Major Component, or to implement a Standard Interface for which an
 implementation is available to the public in source code form. A
 "Major Component", in this context, means a major essential component
-(kernel, window system, and so on) of the specific operating system
+(kernel, window systems, and so on) of the specific operating systems
 (if any) on which the executable work runs, or a compiler used to
 produce the work, or an object code interpreter used to run it.
 
@@ -141,7 +141,7 @@ The "Corresponding Source" for a work in object code form means all
 the source code needed to generate, install, and (for an executable
 work) run the object code and to modify the work, including scripts to
 control those activities. However, it does not include the work's
-System Libraries, or general-purpose tools or generally available free
+systems.System Libraries, or general-purpose tools or generally available free
 programs which are used unmodified in performing those activities but
 which are not part of the work. For example, Corresponding Source
 includes interface definition files associated with source files for
@@ -290,7 +290,7 @@ ways:
     public at no charge under subsection 6d.
 
 A separable portion of the object code, whose source code is excluded
-from the Corresponding Source as a System Library, need not be
+from the Corresponding Source as a systems.System Library, need not be
 included in conveying the object code work.
 
 A "User Product" is either (1) a "consumer product", which means any

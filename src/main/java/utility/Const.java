@@ -4,6 +4,7 @@ package utility;
  * A helper class containing all thinkable and unthinkable constants that the engine might need.
  */
 public class Const {
+    static public final boolean DEV_MODE = true;
     static public final int WINDOW_WIDTH = 512;
     static public final int WINDOW_HEIGHT = 512;
 
@@ -15,7 +16,7 @@ public class Const {
     /**
      *  The path to the project resources folder
      */
-    public static final String MODELS = "./src/main/resources/models/";
+    public static final String MESHES = "./src/main/resources/meshes/";
 
     public static final String CONFIG = "./src/main/resources/config/";
 }
