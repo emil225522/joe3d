@@ -2,34 +2,40 @@ package system.rendering;
 
 import org.joml.Matrix4f;
 
+import java.util.Arrays;
+
 /**
  * A helper class containing buffer info for a renderable object.
  */
 public class RenderInfo {
-    private int index;
+    private int[] vbo;
     private Mesh mesh;
     private Transform transform;
 
     /**
      * Creates a new container for VBO start index, number of vertices, model matrix and material of a renderable object.
      *
-     * @param index
+     * @param vbo
      * @param mesh
      * @param transform
      */
-    public RenderInfo(int index, Mesh mesh, Transform transform) {
-        this.index = index;
+    public RenderInfo(int[] vbo, Mesh mesh, Transform transform) {
+        assert vbo.length==3;
+        this.vbo = Arrays.copyOf(vbo, 3);
         this.mesh = mesh;
         this.transform = transform;
     }
 
-    /**
-     * Returns the index in the VBO for this particular render info instance.
-     *
-     * @return the start index in the VBO.
-     */
-    public int getIndex() {
-        return index;
+    public int getVertexBuffer() {
+        return vbo[0];
+    }
+
+    public int getTexCoordBuffer() {
+        return vbo[1];
+    }
+
+    public int getNormalBuffer() {
+        return vbo[2];
     }
 
     /**
@@ -51,11 +57,33 @@ public class RenderInfo {
     }
 
     /**
+     * Retrieves a reference to the render info mesh.
+     *
+     * @return the mesh of the renderable.
+     */
+    public Mesh getMesh() {
+        return mesh;
+    }
+
+    /**
      * Retrieves a copy of the render material
      *
      * @return a material containing the properties such as color, shininess etc.
      */
     public Material getMaterial() {
         return mesh.material.clone();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RenderInfo that = (RenderInfo) o;
+        return Arrays.equals(vbo, that.vbo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(vbo);
     }
 }

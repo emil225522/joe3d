@@ -1,7 +1,6 @@
 package system.rendering;
 
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import utility.*;
 
@@ -11,9 +10,7 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import java.nio.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -26,7 +23,7 @@ import static utility.Utils.*;
 /**
  * A 3D systems.rendering engine.
  */
-public class RenderSystem {
+public class RenderSystem implements Runnable{
     private static RenderSystem singleton; // TODO can the singleton pattern with startUp(), shutDown() and get() be templated elegantly?
     private long window;
     private int program;
@@ -54,13 +51,12 @@ public class RenderSystem {
 
     /**
      * Creates an OpenGL 3D renderer, operating in a GLFW-managed window.
-     *
-     * @param cam the main camera that views the 3D environment, created in startUp()
      */
-    private RenderSystem(Camera cam) {
+    private RenderSystem() {
         super();
-        this.renders = new ArrayList<>();
-        this.cam = cam;
+        this.renders = new Vector<>();
+        this.cam = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
+        cam.getTransform().translate(0,0,5);
     }
 
     /**
@@ -68,7 +64,7 @@ public class RenderSystem {
      */
     public static void startUp() {
         if (singleton == null) {
-            singleton = new RenderSystem(new Camera(WINDOW_WIDTH, WINDOW_HEIGHT));
+            singleton = new RenderSystem();
             singleton.init();
         }
     }
@@ -155,7 +151,6 @@ public class RenderSystem {
         window = glfwCreateWindow(Const.WINDOW_WIDTH, Const.WINDOW_HEIGHT, "Joe3D", NULL, NULL);
         if (window == NULL) throw new RuntimeException("Failed to create the GLFW window");
 
-        // Center window
         try (MemoryStack stack = stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1);
             IntBuffer pHeight = stack.mallocInt(1);
@@ -196,17 +191,6 @@ public class RenderSystem {
     private void setupBuffers() {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
-
-        glGenBuffers(vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[POSITION]);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[TEXCOORD]);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
-        glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[NORMAL]);
-        glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
-        glEnableVertexAttribArray(2);
     }
 
     /**
@@ -295,15 +279,20 @@ public class RenderSystem {
             glProgramUniform4fv(program, material_color_loc, material.getColor());
             glProgramUniform1f(program, material_shininess_loc, material.getShininess());
 
+            // Bind buffers
+            glBindBuffer(GL_ARRAY_BUFFER, r.getVertexBuffer());
+            glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+            glEnableVertexAttribArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, r.getTexCoordBuffer());
+            glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+            glEnableVertexAttribArray(1);
+            glBindBuffer(GL_ARRAY_BUFFER, r.getNormalBuffer());
+            glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+            glEnableVertexAttribArray(2);
+
             // Draw the vertex buffers!
             glDrawArrays(GL_TRIANGLES, 0, r.getVertexCount());
         }
-    }
-
-    private void updateBuffers() {    // TODO decide if there should be a more high-level intermediary system for structuring these calls.
-        // TODO implement
-        // when a Renderer component calls the render system
-        // add the vertices info to the buffers
     }
 
     /**
@@ -312,21 +301,23 @@ public class RenderSystem {
      * @param mesh      the 3d mesh to add to render info
      * @param transform the transform values to add to render info
      */
-    public int addRenderInfo(Mesh mesh, Transform transform) {
-        int index = renders.size();
-        renders.add(new RenderInfo(index, mesh, transform));
-        return index;
+    public int[] addRenderInfo(Mesh mesh, Transform transform) {
+        int[] vbo = new int[3];
+        glGenBuffers(vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[POSITION]);
+        glBufferData(GL_ARRAY_BUFFER, mesh.getVertexPositions(), GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[TEXCOORD]);
+        glBufferData(GL_ARRAY_BUFFER, mesh.getVertexTexCoords(), GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[NORMAL]);
+        glBufferData(GL_ARRAY_BUFFER, mesh.getVertexNormals(), GL_DYNAMIC_DRAW);
+        renders.add(new RenderInfo(vbo,mesh,transform));
+        return vbo;
     }
 
-    /**
-     * s
-     *
-     * @param index
-     * @return
-     */
-    public boolean removeRenderInfo(int index) {
-        // TODO implement
-        return false;
+    public boolean removeRenderInfo(int[] vbo) {
+        glDeleteBuffers(vbo);
+        return renders.remove(new RenderInfo(vbo, null, null));
+
     }
 
     private void installLights(Matrix4f vMat) {

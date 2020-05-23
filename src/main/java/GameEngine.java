@@ -1,6 +1,7 @@
 import system.rendering.Camera;
 import game.core.Scene;
 import system.rendering.*;
+import utility.MeshBuilder;
 
 import static utility.Const.*;
 
@@ -10,8 +11,12 @@ import static utility.Const.*;
 public class GameEngine {
     public static void main(String[] args) {
         RenderSystem.startUp();
+        RenderSystem renderer = RenderSystem.get();
 
-        RenderSystem.get().run();
+        Mesh mesh = MeshBuilder.build(MESHES+"suzanne.obj");
+        renderer.addRenderInfo(mesh, new Transform());
+
+        renderer.run();
 
         RenderSystem.shutDown();
     }

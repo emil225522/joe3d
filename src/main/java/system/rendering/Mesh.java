@@ -17,8 +17,12 @@ public class Mesh {
      * @param vertices
      */
     public Mesh(Vertex[] vertices) {
+        this(vertices, new Material());
+    }
+
+    public Mesh(Vertex[] vertices, Material material) {
         this.vertices = vertices;
-        this.material = new Material();
+        this.material = material;
     }
 
     /**
