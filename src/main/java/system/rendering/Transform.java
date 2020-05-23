@@ -1,5 +1,7 @@
-package core;
+package system.rendering;
 
+import org.joml.Matrix3fc;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -91,5 +93,13 @@ public class Transform {
      */
     public Quaternionf getRotation() {
         return new Quaternionf(rotation);
+    }
+
+    public Matrix4f calculateModelMatrix() {
+        Matrix4f m = new Matrix4f();
+        m.scale(scale);
+        m.translate(position);
+        m.rotate(rotation);
+        return m;
     }
 }

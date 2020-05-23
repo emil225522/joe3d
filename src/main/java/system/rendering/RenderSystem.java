@@ -1,9 +1,5 @@
-package graphics;
+package system.rendering;
 
-import core.Camera;
-import core.GameObject;
-import control.Input;
-import core.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
@@ -28,72 +24,91 @@ import static utility.Const.*;
 import static utility.Utils.*;
 
 /**
- * A 3D rendering engine.
+ * A 3D systems.rendering engine.
  */
-public class Renderer {
+public class RenderSystem {
+    private static RenderSystem singleton; // TODO can the singleton pattern with startUp(), shutDown() and get() be templated elegantly?
     private long window;
     private int program;
-    Input input = new Input();
-
     private final String VERT = SHADERS + "bp.vert";
     private final String FRAG = SHADERS + "bp.frag";
 
     // Buffers and containers for such stuff
     private int vao;
+    private final int POSITION = 0;
+    private final int TEXCOORD = 1;
+    private final int NORMAL = 2;
+    private final int NUM_BUFFERS = 3;
+    private int[] vbo = new int[NUM_BUFFERS];
 
-    private List<RenderInfo> renders = new ArrayList<>();
-
-    // Abstract objects
+    // Camera related
     private Camera cam;
-    private Scene scene;
-    private Vector3fc cameraDirection = new Vector3f(0, 0, -1);
+    Matrix4f pMat;
+    Matrix4f vMat;
 
-    // TODO remove shader testing light
-    PositionalLight light = new PositionalLight();
+    // Render related
+    private List<RenderInfo> renders;
+
+    // Debug lighting TODO remove shader testing light
+    Light light = new Light();
 
     /**
-     * Creates an OpenGL 3D renderer, operating in a GLFW-managed window. Throws exception if the scene has no main camera.
+     * Creates an OpenGL 3D renderer, operating in a GLFW-managed window.
      *
-     * @param scene the scene to render.
+     * @param cam the main camera that views the 3D environment, created in startUp()
      */
-    public Renderer(Scene scene) {
-        try {
-            this.cam = scene.getMainCamera();
-        } catch (NullPointerException e) {
-            throw new NullPointerException("Unable to find a main camera in the scene.");
-        }
-        this.scene = scene;
+    private RenderSystem(Camera cam) {
+        super();
+        this.renders = new ArrayList<>();
+        this.cam = cam;
     }
 
     /**
-     * Initializes the renderer and starts the render loop.
+     * Starts the render system up.
+     */
+    public static void startUp() {
+        if (singleton == null) {
+            singleton = new RenderSystem(new Camera(WINDOW_WIDTH, WINDOW_HEIGHT));
+            singleton.init();
+        }
+    }
+
+    /**
+     * Shuts the render system down.
+     */
+    public static void shutDown() {
+        if (singleton != null) {
+            singleton.free();
+            singleton = null;
+        }
+    }
+
+    /**
+     * Gets a RenderSystem reference
+     *
+     * @return the reference to the RenderSystem singleton
+     */
+    public static RenderSystem get() {
+        return singleton;
+    }
+
+    /**
+     * Starts the render loop.
      */
     public void run() {
-        init();
-
         while (!glfwWindowShouldClose(window)) {
-
+            // Actual rendering and state updates
             updateCamera();
             updateSceneElements();
-
             renderScene();
-
+            // V-sync and callbacks
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
-        glfwFreeCallbacks(window);
-        glfwDestroyWindow(window);
-
-        glfwTerminate();
-        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 
-
-
-
-
     /**
-     * This initializer method does a few things: <br>
+     * This initializer method does a few things:
      * <ul>
      *  <li>Initializes GLFW and GL capabilities.</li>
      *  <li>Sets default OpenGL states.</li>
@@ -106,7 +121,6 @@ public class Renderer {
         setupGLFW();
         GL.createCapabilities();
         setupCallbacks();
-
 
         // OpenGL states
         glFrontFace(GL_CCW);
@@ -123,14 +137,6 @@ public class Renderer {
         // Create shader program
         program = createProgram(VERT, FRAG);
         glUseProgram(program);
-    }
-
-    private void updateCamera() {
-
-    }
-
-    private void updateSceneElements() {
-
     }
 
     /**
@@ -170,12 +176,8 @@ public class Renderer {
     private void setupCallbacks() {
         // Setup a key callback
         glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
-            else {
-                input.read(key, action, mods);
-            }
+                glfwSetWindowShouldClose(window, true); // We will detect this in the systems.rendering loop
         });
 
         // Window resize callback
@@ -189,26 +191,22 @@ public class Renderer {
     }
 
     /**
-     * Sets up vertex and element (index) buffers for all objects in the scene.
+     * Sets up vao and vbos.
      */
     private void setupBuffers() {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
-        for (GameObject obj : scene.getObjects()) {
-            if (!(obj instanceof RenderObject)) continue;
-            RenderObject r = (RenderObject) obj;
-            int v = glGenBuffers();
-            int t = glGenBuffers();
-            int n = glGenBuffers();
-            glBindBuffer(GL_ARRAY_BUFFER, v);
-            glBufferData(GL_ARRAY_BUFFER, r.getMesh().getVertexPositions(), GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, t);
-            glBufferData(GL_ARRAY_BUFFER, r.getMesh().getVertexTexCoords(), GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, n);
-            glBufferData(GL_ARRAY_BUFFER, r.getMesh().getVertexNormals(), GL_STATIC_DRAW);
-            renders.add(new RenderInfo(r, v, t, n));
-        }
+        glGenBuffers(vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[POSITION]);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[TEXCOORD]);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[NORMAL]);
+        glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(2);
     }
 
     /**
@@ -252,6 +250,23 @@ public class Renderer {
         return program;
     }
 
+    private void updateCamera() {
+        // Update camera view
+        cam.lookAt(cam.getTransform().getPosition().add(new Vector3f(0, 0, -1)));
+
+        // Create perspective and view matrices
+        pMat = cam.getPerspective();
+        vMat = cam.getView();
+    }
+
+    private void updateSceneElements() {
+
+
+        // Install lights TODO multiple light support
+        light.getTransform().translate(6, 6, 6);
+        installLights(vMat);
+    }
+
     /**
      * Meaty method! It renders the frame with all the objects and phew... I won't bother commenting this further as of now...
      */
@@ -262,20 +277,8 @@ public class Renderer {
         int proj_mat_loc = glGetUniformLocation(program, "proj_mat");
         int mv_mat_loc = glGetUniformLocation(program, "mv_mat");
         int n_mat_loc = glGetUniformLocation(program, "n_mat");
-        int Mcolor = glGetUniformLocation(program, "material.color");
-        int MshiLoc = glGetUniformLocation(program, "material.shininess");
-
-
-        // Update camera view
-        cam.lookAt(cam.getTransform().getPosition().add(cameraDirection));
-
-        // Create perspective and view matrices
-        Matrix4f pMat = cam.getPerspective();
-        Matrix4f vMat = cam.getView();
-
-        // Install lights
-        light.getTransform().translate(6, 6, 6);
-        installLights(vMat);
+        int material_color_loc = glGetUniformLocation(program, "material.color");
+        int material_shininess_loc = glGetUniformLocation(program, "material.shininess");
 
         // Set shader perspective uniform
         glUniformMatrix4fv(proj_mat_loc, false, pMat.get(new float[16]));
@@ -289,26 +292,41 @@ public class Renderer {
             // Set per model shader uniform
             glUniformMatrix4fv(mv_mat_loc, false, mvMat.get(new float[16]));
             glUniformMatrix4fv(n_mat_loc, false, mvMat.invert().transpose().get(new float[16]));
-            glProgramUniform4fv(program, Mcolor, material.getColor());
-            glProgramUniform1f(program, MshiLoc, material.getShininess());
-
-            // Set layout variables in shaders
-            // Positions
-            glBindBuffer(GL_ARRAY_BUFFER, r.getVBO());
-            glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-            glEnableVertexAttribArray(0);
-            // Tex coords
-            glBindBuffer(GL_ARRAY_BUFFER, r.getTBO());
-            glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
-            glEnableVertexAttribArray(1);
-            // Normals
-            glBindBuffer(GL_ARRAY_BUFFER, r.getNBO());
-            glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
-            glEnableVertexAttribArray(2);
+            glProgramUniform4fv(program, material_color_loc, material.getColor());
+            glProgramUniform1f(program, material_shininess_loc, material.getShininess());
 
             // Draw the vertex buffers!
-            glDrawArrays(GL_TRIANGLES, 0, r.getNumVertex());
+            glDrawArrays(GL_TRIANGLES, 0, r.getVertexCount());
         }
+    }
+
+    private void updateBuffers() {    // TODO decide if there should be a more high-level intermediary system for structuring these calls.
+        // TODO implement
+        // when a Renderer component calls the render system
+        // add the vertices info to the buffers
+    }
+
+    /**
+     * Adds render info for the specified mesh and transform to the renderer
+     *
+     * @param mesh      the 3d mesh to add to render info
+     * @param transform the transform values to add to render info
+     */
+    public int addRenderInfo(Mesh mesh, Transform transform) {
+        int index = renders.size();
+        renders.add(new RenderInfo(index, mesh, transform));
+        return index;
+    }
+
+    /**
+     * s
+     *
+     * @param index
+     * @return
+     */
+    public boolean removeRenderInfo(int index) {
+        // TODO implement
+        return false;
     }
 
     private void installLights(Matrix4f vMat) {
@@ -322,7 +340,7 @@ public class Renderer {
 
         // set the current globalAmbient settings
         int globalAmbLoc = glGetUniformLocation(program, "globalAmbient");
-        glProgramUniform4fv(program, globalAmbLoc, Light.globalAmbient);
+        glProgramUniform4fv(program, globalAmbLoc, Light.GLOBAL_AMBIENT);
 
         // get the locations of the light and material fields in the shader
         int ambLoc = glGetUniformLocation(program, "light.ambient");
@@ -335,5 +353,12 @@ public class Renderer {
         glProgramUniform4fv(program, diffLoc, light.getDiffuse());
         glProgramUniform4fv(program, specLoc, light.getSpecular());
         glProgramUniform3fv(program, posLoc, viewspaceLightPos);
+    }
+
+    private void free() {
+        glfwFreeCallbacks(window);
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 }

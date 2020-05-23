@@ -1,4 +1,4 @@
-package graphics;
+package system.rendering;
 
 import java.awt.*;
 

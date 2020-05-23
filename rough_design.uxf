@@ -225,7 +225,7 @@ rotation : Quaternionf</panel_attributes>
       <w>693</w>
       <h>462</h>
     </coordinates>
-    <panel_attributes>graphics
+    <panel_attributes>systems.rendering
 --
 bg=pink</panel_attributes>
     <additional_attributes/>

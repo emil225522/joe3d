@@ -1,6 +1,6 @@
 # joe3D
 
-Joe3D is a custom 3D game engine developed by a Swedish computer science student based in Helsingborg. It is written in Java using the OpenGL API for rendering.
+Joe3D is a custom 3D game engine developed by a Swedish computer science student based in Helsingborg. It is written in Java using the OpenGL API for systems.rendering.
 
 ## Getting started
 

@@ -1,5 +1,6 @@
-package core;
+package game.core;
 
+import system.rendering.Transform;
 import org.joml.Matrix4f;
 
 /**
@@ -13,18 +14,6 @@ public abstract class GameObject {
      */
     public GameObject(){
         this.transform = new Transform();
-    }
-
-    /**
-     * Retrieves the model matrix for the object.
-     * @return a position, scale and rotation transformation matrix.
-     */
-    public Matrix4f getModelMatrix(){
-        Matrix4f m = new Matrix4f();
-        m.scale(transform.getScale());
-        m.translate(transform.getPosition());
-        m.rotate(transform.getRotation());
-        return m;
     }
 
     /**

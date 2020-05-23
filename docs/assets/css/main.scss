@@ -31,10 +31,13 @@
 .highlighter-rouge {
   font-size: 20px;
   font-family: "Rubik",
-  -apple-systems,
+  -apple-system,
   BlinkMacSystemFont,
   "Helvetica Neue",
-  sans-serif
+  sans-serif;
+  border-radius: 8px;
+  background-color: var(--link-color);
+  color: var(--code-bg-color); 
 }
 
 .highlight {
@@ -75,4 +78,9 @@ pre code {
 
 img {
     border-radius: 8px;
+}
+
+li {
+  margin-top: 5px;
+  margin-bottom: 5px;
 }

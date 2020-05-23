@@ -1,10 +1,11 @@
-package core;
+package game.core;
+
+import system.rendering.Camera;
 
 import java.util.*;
-import java.util.concurrent.Flow;
 
 /**
- * A 3D scene, capable of holding multiple 3D objects for future rendering.
+ * A 3D scene, capable of holding multiple 3D objects for future systems.rendering.
  */
 public class Scene {
     private List<GameObject> objects;
@@ -40,13 +41,5 @@ public class Scene {
      */
     public Collection<GameObject> getObjects() {
         return objects;
-    }
-
-    /**
-     * Gets a reference to the main camera of the scene.
-     * @return the main camera of the scene.
-     */
-    public Camera getMainCamera() {
-        return (Camera) objects.get(0);
     }
 }

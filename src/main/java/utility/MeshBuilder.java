@@ -1,8 +1,8 @@
 package utility;
 
-import graphics.Mesh;
+import system.rendering.Mesh;
 
-import graphics.Vertex;
+import system.rendering.Vertex;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 

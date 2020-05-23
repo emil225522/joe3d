@@ -1,11 +1,13 @@
-package graphics;
+package game.core;
 
-import core.GameObject;
+import org.joml.Matrix4f;
+import system.rendering.Material;
+import system.rendering.Mesh;
 
 /**
  * A renderable game object. In addition to being a game object, it also has a mesh and a material.
  */
-public class RenderObject extends GameObject {
+public class MeshRenderer extends Component {
     private Mesh mesh;
     private Material material;
 
@@ -13,8 +15,8 @@ public class RenderObject extends GameObject {
      * Creates a new renderable object with the specified mesh and a default material.
      * @param mesh the object mesh
      */
-    public RenderObject(Mesh mesh) {
-        this(mesh, new Material());
+    public MeshRenderer(GameObject parent, Mesh mesh) {
+        this(parent, mesh, new Material());
     }
 
     /**
@@ -22,8 +24,8 @@ public class RenderObject extends GameObject {
      * @param mesh the object mesh
      * @param material the object material
      */
-    public RenderObject(Mesh mesh, Material material) {
-        super();
+    public MeshRenderer(GameObject parent, Mesh mesh, Material material) {
+        super(parent);
         this.mesh = mesh;
         this.material = material;
     }
@@ -42,5 +44,18 @@ public class RenderObject extends GameObject {
      */
     public Material getMaterial() {
         return material;
+    }
+
+    /**
+     * Retrieves the model matrix for the parent GameObject of this component.
+     * @return a position, scale and rotation transformation matrix.
+     */
+    public Matrix4f getModelMatrix(){
+        return parent.getTransform().calculateModelMatrix();
+    }
+
+    @Override
+    public void execute() {
+
     }
 }

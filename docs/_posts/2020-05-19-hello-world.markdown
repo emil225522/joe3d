@@ -11,7 +11,7 @@ categories: general
 If you found your way here it looks like you've stumbled upon the project page for my game engine, Joe3D!
 
 ![Ook!]({{site.baseurl}}/assets/img/suzannes.png)
-
+<!–-break-–>
 So, what's the goal? What's the deal? Why bother with a game engine, you might ask? Well, graphics are kinda cool and I wanna know how to do them, that's why!
 
 But it's not only that. I've dabbled very shallowly in various game engines but I never really felt satisfied not knowing what was going on under the hood. I also realized I'm more interested in the architecture and design of game engines, rather than the games themselves. So here we are. :)

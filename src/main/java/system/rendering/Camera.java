@@ -1,13 +1,13 @@
-package core;
+package system.rendering;
 
-import core.GameObject;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 /**
  * A camera for transforming views in OpenGL contexts.
  */
-public class Camera extends GameObject {
+public class Camera {
+    private Transform transform;
     private Matrix4f perspective;
     private Matrix4f view;
 
@@ -17,7 +17,7 @@ public class Camera extends GameObject {
      * @param height the height of the viewport.
      */
     public Camera(float width, float height){
-        super();
+        transform = new Transform();
         perspective = new Matrix4f();
         view = new Matrix4f();
 
@@ -30,7 +30,7 @@ public class Camera extends GameObject {
      * @param target the target to look at
      */
     public void lookAt(Vector3f target){
-        view.identity().lookAt(transform.getPosition(), target, new Vector3f(0,1,0).rotate(getTransform().getRotation()).normalize());
+        view.identity().lookAt(transform.getPosition(), target, new Vector3f(0,1,0).rotate(transform.getRotation()).normalize());
     }
 
     /**
@@ -41,6 +41,10 @@ public class Camera extends GameObject {
      */
     public void lookAt(float x, float y, float z){
         lookAt(new Vector3f(x,y,z));
+    }
+
+    public Transform getTransform() {
+        return transform;
     }
 
     /**

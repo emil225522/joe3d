@@ -8,6 +8,8 @@ public class Const {
     static public final int WINDOW_WIDTH = 512;
     static public final int WINDOW_HEIGHT = 512;
 
+
+
     /**
      *  The path to the project shaders folder
      */

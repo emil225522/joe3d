@@ -1,4 +1,4 @@
-package graphics;
+package system.rendering;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -10,6 +10,7 @@ import java.util.Arrays;
  */
 public class Mesh {
     Vertex[] vertices;
+    Material material;
 
     /**
      * Creates a new model. Preferably built with the static ModelBuilder class.
@@ -17,6 +18,7 @@ public class Mesh {
      */
     public Mesh(Vertex[] vertices) {
         this.vertices = vertices;
+        this.material = new Material();
     }
 
     /**
@@ -28,8 +30,8 @@ public class Mesh {
     }
 
     /**
-     * Returns a copy of all vertices. Vertices are stored in a float array to use with OpenGL draw methods.
-     * @return an array containing all mesh vertices.
+     * Returns a copy of all vertex positions. Data is stored in a float array to use with OpenGL buffers and draw methods.
+     * @return an array containing all mesh vertex positions.
      */
     public float[] getVertexPositions() {
         float[] vs = new float[vertices.length * 3];
@@ -42,6 +44,10 @@ public class Mesh {
         return vs;
     }
 
+    /**
+     * Returns a copy of all vertex texture coordinates. Data is stored in a float array to use with OpenGL buffers and draw methods.
+     * @return an array containing all mesh vertex texture coordinates.
+     */
     public float[] getVertexTexCoords() {
         float[] ts = new float[vertices.length * 2];
         for (int i = 0; i < vertices.length; i++) {
@@ -54,6 +60,10 @@ public class Mesh {
         return ts;
     }
 
+    /**
+     * Returns a copy of all vertex normals. Data is stored in a float array to use with OpenGL buffers and draw methods.
+     * @return an array containing all mesh vertex normals.
+     */
     public float[] getVertexNormals() {
         float[] ns = new float[vertices.length * 3];
         for (int i = 0; i < vertices.length; i++) {
@@ -65,6 +75,14 @@ public class Mesh {
             }
         }
         return ns;
+    }
+
+    /**
+     * Returns a reference to the mesh material.
+     * @return the mesh material.
+     */
+    public Material getMaterial() {
+        return material;
     }
 
     @Override
@@ -79,5 +97,4 @@ public class Mesh {
     public int hashCode() {
         return Arrays.hashCode(vertices);
     }
-
 }

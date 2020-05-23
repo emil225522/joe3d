@@ -1,4 +1,4 @@
-package graphics;
+package system.rendering;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
