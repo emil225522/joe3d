@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>873</x>
+      <y>81</y>
+      <w>189</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>Mesh
+bg=white
+--
+--
++Mesh(Vertex[], Material[0..1])
++vertexCount : int
++getVertexPositions() : float[]
++getVertexTexCoords() : float[]
++getVertexNormals() : float[]
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1125</x>
+      <y>81</y>
+      <w>171</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>Vertex
+bg=white
+--
++position : Vector3f[]
++texCoord : Vector2f[]
++normal : Vector3f[]
+--
++getPosition() : Vector3f[]
++getTexCoord() : Vector2f[]
++getNormal() :Vector3f[]</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>864</x>
+      <y>261</y>
+      <w>198</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>Transform
+bg=white
+--
+-position : Vector3f
+-scale : Vector3f
+-rotation : Quaternionf
+--
++getPosition() : Vector3f
++getScale() : Vector3f
++getRotation() : Quaternionf
++calculateModelMatrix : Matrix4f</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>261</x>
+      <y>9</y>
+      <w>1071</w>
+      <h>648</h>
+    </coordinates>
+    <panel_attributes>rendering
+--
+bg=gray
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>63</x>
+      <y>171</y>
+      <w>126</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>JOML
+--
+All the handy
+linear algebra
+operations you
+could dream of
+bg=pink</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>180</x>
+      <y>198</y>
+      <w>99</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>594</x>
+      <y>450</y>
+      <w>171</w>
+      <h>162</h>
+    </coordinates>
+    <panel_attributes>Camera
+bg=white
+--
+-perspective : Matrix4fv
+-view : Matrix4f
+--
++Camera(float, float)
++lookAt(Vector3f)
++lookAt(float, float, float)
++getTransform() : Transform
++getPerspective() : Matrix4f
++getView() : Matrix4f
++setPerspective(float)
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>594</x>
+      <y>252</y>
+      <w>171</w>
+      <h>162</h>
+    </coordinates>
+    <panel_attributes>Light
+bg=white
+--
+_+GLOBAL_AMBIENT : float[]_
+-ambient : float[]
+-diffuse : float[]
+-specular : float[]
+--
++Light()
++getTransform() : Transform
++getAmbient() : float[]
++getDiffuse() : float[]
++getSpecular() : float[]</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1134</x>
+      <y>279</y>
+      <w>180</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>Material
+bg=white
+--
+-color : float[]
+-shininess : float
+--
++Material(float[0..4], float[0..1])
++getColor() : float[]
++getShininess() : float
++setColor(float[3..4])
++setShininess(float)
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1134</x>
+      <y>450</y>
+      <w>180</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>Texture
+bg=white
+--
+_+CHECKERBOARD : byte[]_
+_+DEFAULT : float[]_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1053</x>
+      <y>108</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>585</x>
+      <y>81</y>
+      <w>207</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>RenderInfo
+bg=white
+--
+-index : int
+-
++RenderInfo(int, Mesh, Transform)
++getIndex() : int
++getVertexCount() : int
++getModelMatrix() : Matrix4f
++getMaterial() : Material</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>288</x>
+      <y>45</y>
+      <w>252</w>
+      <h>468</h>
+    </coordinates>
+    <panel_attributes>RenderSystem
+bg=white
+--
+_-singleton : RenderSystem_
+_-POSITION : int_
+_-TEXCOORD: int_
+_-NORMAL : int_
+_-NUM_BUFFERS : int_
+-VERTEX_SHADER : String
+-FRAGMENT_SHADER : String
+-window : long
+-program : int
+-vao : int
+-vbo : int[]
+-projectionMatrix : Matrix4f
+-viewMatrix : Matrix4f
+--
+-RenderSystem(Camera)
+_+startUp()_
+_+shutDown()_
+_+get() : RenderSystem_
++run()
++addRenderInfo() : int
++removeRenderInfo(int)
+-init()
+-free()
+-setupGLFW()
+-setupCallbacks()
+-setupBuffers()
+-updateBuffers()
+-updateCamera()
+-updateSceneElements()
+-renderScene()
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>531</x>
+      <y>108</y>
+      <w>72</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1053</x>
+      <y>153</y>
+      <w>99</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>90.0;180.0;60.0;180.0;60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1053</x>
+      <y>171</y>
+      <w>99</w>
+      <h>333</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>90.0;350.0;40.0;350.0;40.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>531</x>
+      <y>468</y>
+      <w>81</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>70.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>531</x>
+      <y>270</y>
+      <w>81</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;70.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>342</y>
+      <w>126</w>
+      <h>162</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>120.0;10.0;50.0;10.0;50.0;160.0;10.0;160.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>306</y>
+      <w>126</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>120.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>783</x>
+      <y>135</y>
+      <w>108</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>783</x>
+      <y>180</y>
+      <w>99</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>90.0;120.0;40.0;120.0;40.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>
