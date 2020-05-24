@@ -74,6 +74,11 @@ public class RenderInfo {
         return mesh.material.clone();
     }
 
+    // TODO debug remove
+    public Transform getTransform() {
+        return transform;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

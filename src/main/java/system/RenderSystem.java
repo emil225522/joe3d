@@ -1,8 +1,10 @@
-package system.rendering;
+package system;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.joml.Matrix4f;
+import system.rendering.*;
+
 import java.util.*;
 
 import static org.lwjgl.opengl.GL43.*;
@@ -13,7 +15,7 @@ import static utility.Utils.*;
  * A 3D rendering engine.
  */
 public class RenderSystem {
-    private static RenderSystem singleton; // TODO can the singleton pattern with startUp(), shutDown() and get() be templated elegantly?
+    private static RenderSystem instance; // TODO can the singleton pattern with startUp(), shutDown() and get() be templated elegantly?
 
     private Window window;
     private int program;
@@ -42,30 +44,30 @@ public class RenderSystem {
     /**
      * Creates an OpenGL 3D renderer, operating in a GLFW-managed window.
      */
-    private RenderSystem() {
-        this.window = new Window(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, true);
+    private RenderSystem(Window window) {
+        this.window = window;
         this.renders = new Vector<>();
         this.cam = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
-        cam.getTransform().translate(0,0,5);
+        cam.getTransform().translate(0, 0, 5);
     }
 
     /**
      * Starts the render system up.
      */
-    public static RenderSystem startUp(){
-        if (singleton == null) {
-            singleton = new RenderSystem();
-            singleton.init();
+    public static void startUp(Window window) {
+        if (instance == null) {
+            instance = new RenderSystem(window);
+            instance.init();
         }
-        return singleton;
     }
 
     /**
      * Shuts the render system down.
      */
     public static void shutDown() {
-        if (singleton != null) {
-            singleton = null;
+        if (instance != null) {
+            instance.free();
+            instance = null;
         }
     }
 
@@ -75,21 +77,23 @@ public class RenderSystem {
      * @return the reference to the RenderSystem singleton
      */
     public static RenderSystem get() {
-        return singleton;
+        if(instance==null) throw new NullPointerException("Unable to find active render system.");
+        return instance;
     }
 
     /**
-     * Starts the render loop.
+     * Renders a frame.
      */
-    public void run() {
-        while (!window.windowShouldClose()) {
-            // Actual rendering and state updates
-            updateCamera();
-            updateSceneElements();
-            renderScene();
+    public void update() {
+        // Actual rendering and state updates
+        updateCamera();
+        updateSceneElements();
+        renderScene();
+        window.update();
+    }
 
-            window.update();
-        }
+    public boolean shouldClose(){
+        return window.windowShouldClose();
     }
 
     /**
@@ -108,7 +112,6 @@ public class RenderSystem {
         glEnable(GL_DEPTH);
         glEnable(GL_MULTISAMPLE);
         glDepthFunc(GL_LEQUAL);
-        glClearColor(0.2f, 0.2f, 0.2f, 1);
 
         // Create and bind the VAO
         vao = glGenVertexArrays();
@@ -160,20 +163,28 @@ public class RenderSystem {
         return program;
     }
 
+    /**
+     * Updates camera view, and perspective if window has been resized.
+     */
     private void updateCamera() {
         cam.lookAt(cam.getTransform().getPosition().add(new Vector3f(0, 0, -1)));
         vMat = cam.getView();
 
         // Update perspective if resized
-        if(window.isResized()){
-            cam.setPerspective((float)window.getWidth()/(float)window.getHeight());
+        if (window.isResized()) {
+            cam.setPerspective((float) window.getWidth() / (float) window.getHeight());
             pMat = cam.getPerspective();
         }
     }
 
+    /**
+     *
+     */
     private void updateSceneElements() {
         // Install lights TODO multiple light support
+        if (renders.isEmpty()) return;
         light.getTransform().translate(6, 6, 6);
+        renders.get(0).getTransform().rotate(1, 0, 1, 0); // TODO remove debug
         installLights(vMat);
     }
 
@@ -236,7 +247,7 @@ public class RenderSystem {
         glBufferData(GL_ARRAY_BUFFER, mesh.getVertexTexCoords(), GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, vbo[NORMAL]);
         glBufferData(GL_ARRAY_BUFFER, mesh.getVertexNormals(), GL_DYNAMIC_DRAW);
-        renders.add(new RenderInfo(vbo,mesh,transform));
+        renders.add(new RenderInfo(vbo, mesh, transform));
         return vbo;
     }
 
@@ -272,4 +283,16 @@ public class RenderSystem {
         glProgramUniform3fv(program, posLoc, viewspaceLightPos);
     }
 
+    private void free() {
+        glDeleteVertexArrays(vao);
+        glDeleteBuffers(vbo);
+        glDeleteProgram(program);
+        renders.clear();
+        window.destroy();
+        renders = null;
+        window = null;
+        cam = null;
+        pMat = null;
+        vMat = null;
+    }
 }

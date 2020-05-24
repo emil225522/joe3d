@@ -1,7 +1,6 @@
 package game.core;
 
-import org.joml.Matrix4f;
-import system.rendering.Material;
+import system.RenderSystem;
 import system.rendering.Mesh;
 
 /**
@@ -9,60 +8,23 @@ import system.rendering.Mesh;
  */
 public class MeshRenderer extends Component {
     private Mesh mesh;
-    private Material material;
-
-    /**
-     * Creates a new renderable object with the specified mesh and a default material.
-     * @param mesh the object mesh
-     */
-    public MeshRenderer(GameObject parent, Mesh mesh) {
-        this(parent, mesh, new Material());
-    }
 
     /**
      * Creates a new renderable object with the specified mesh and material.
+     *
      * @param mesh the object mesh
-     * @param material the object material
      */
-    public MeshRenderer(GameObject parent, Mesh mesh, Material material) {
-        super(parent);
+    public MeshRenderer(Mesh mesh) {
         this.mesh = mesh;
-        this.material = material;
     }
-
-    /**
-     * Retrieves a reference to the object mesh
-     * @return the object material
-     */
-    public Mesh getMesh(){
-        return mesh;
-    }
-
-    /**
-     * Retrieves a reference to the object material
-     * @return the object material
-     */
-    public Material getMaterial() {
-        return material;
-    }
-
-    /**
-     * Retrieves the model matrix for the parent GameObject of this component.
-     * @return a position, scale and rotation transformation matrix.
-     */
-    public Matrix4f getModelMatrix(){
-        return parent.getTransform().calculateModelMatrix();
-    }
-
-
 
     @Override
     void start() {
-
+        RenderSystem.get().addRenderInfo(mesh, parent.getTransform());
     }
 
     @Override
-    void update() {
-
+    void update(float interval) {
+        // Called every frame
     }
 }

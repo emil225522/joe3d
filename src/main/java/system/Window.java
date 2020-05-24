@@ -1,4 +1,4 @@
-package system.rendering;
+package system;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -11,9 +11,9 @@ import java.util.Objects;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import static utility.Const.*;
 
 public class Window {
+
     private final String title;
     private int width;
     private int height;
@@ -30,7 +30,10 @@ public class Window {
         init();
     }
 
-    public void init() {
+    /**
+     *  Initializes the GLFW and GL context.
+     */
+    private void init() {
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
         GLFWErrorCallback.createPrint(System.err).set();
@@ -48,19 +51,21 @@ public class Window {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_SAMPLES, 8);
+
 
         // Create the window
         windowHandle = glfwCreateWindow(width, height, title, NULL, NULL);
         if (windowHandle == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
+        glfwSetCursor(windowHandle, glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR));
 
         // Get the resolution of the primary monitor
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
         // Center our window
-        glfwSetWindowPos(windowHandle, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2
-        );
+        glfwSetWindowPos(windowHandle, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(windowHandle);
@@ -88,8 +93,8 @@ public class Window {
         // Make the window visible
         glfwShowWindow(windowHandle);
 
-        // Set the clear color
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        // Set the clear color;
+        glClearColor(0.2f, 0.2f, 0.2f, 1);
     }
 
     public void setClearColor(float r, float g, float b, float alpha) {

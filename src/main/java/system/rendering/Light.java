@@ -3,8 +3,9 @@ package system.rendering;
 /**
  * A generic light class. Provides basic functionality for concrete light classes.
  */
-public  class Light {
+public class Light {
     public static final float[] GLOBAL_AMBIENT = new float[]{0.3f, 0.3f, 0.3f, 1.0f};
+
     private Transform transform;
     private float[] ambient;
     private float[] diffuse;
