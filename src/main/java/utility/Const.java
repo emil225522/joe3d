@@ -5,6 +5,7 @@ package utility;
  */
 public class Const {
     static public final boolean DEV_MODE = true;
+    static public final String WINDOW_TITLE = "Joe3D";
     static public final int WINDOW_WIDTH = 512;
     static public final int WINDOW_HEIGHT = 512;
 

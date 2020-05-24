@@ -54,8 +54,15 @@ public class MeshRenderer extends Component {
         return parent.getTransform().calculateModelMatrix();
     }
 
+
+
     @Override
-    public void execute() {
+    void start() {
+
+    }
+
+    @Override
+    void update() {
 
     }
 }

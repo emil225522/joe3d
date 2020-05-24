@@ -7,5 +7,6 @@ public abstract class Component {
         this.parent = parent;
     }
 
-    abstract void execute();
+    abstract void start();
+    abstract void update();
 }

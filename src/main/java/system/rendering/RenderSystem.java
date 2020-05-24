@@ -2,30 +2,20 @@ package system.rendering;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import utility.*;
-
 import org.joml.Matrix4f;
-import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
-
-import java.nio.*;
 import java.util.*;
 
-import static org.lwjgl.glfw.Callbacks.*;
-import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL43.*;
-import static org.lwjgl.system.MemoryStack.*;
-import static org.lwjgl.system.MemoryUtil.*;
 import static utility.Const.*;
 import static utility.Utils.*;
 
 /**
- * A 3D systems.rendering engine.
+ * A 3D rendering engine.
  */
-public class RenderSystem implements Runnable{
+public class RenderSystem {
     private static RenderSystem singleton; // TODO can the singleton pattern with startUp(), shutDown() and get() be templated elegantly?
-    private long window;
+
+    private Window window;
     private int program;
     private final String VERT = SHADERS + "bp.vert";
     private final String FRAG = SHADERS + "bp.frag";
@@ -53,7 +43,7 @@ public class RenderSystem implements Runnable{
      * Creates an OpenGL 3D renderer, operating in a GLFW-managed window.
      */
     private RenderSystem() {
-        super();
+        this.window = new Window(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, true);
         this.renders = new Vector<>();
         this.cam = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
         cam.getTransform().translate(0,0,5);
@@ -62,11 +52,12 @@ public class RenderSystem implements Runnable{
     /**
      * Starts the render system up.
      */
-    public static void startUp() {
+    public static RenderSystem startUp(){
         if (singleton == null) {
             singleton = new RenderSystem();
             singleton.init();
         }
+        return singleton;
     }
 
     /**
@@ -74,7 +65,6 @@ public class RenderSystem implements Runnable{
      */
     public static void shutDown() {
         if (singleton != null) {
-            singleton.free();
             singleton = null;
         }
     }
@@ -92,32 +82,25 @@ public class RenderSystem implements Runnable{
      * Starts the render loop.
      */
     public void run() {
-        while (!glfwWindowShouldClose(window)) {
+        while (!window.windowShouldClose()) {
             // Actual rendering and state updates
             updateCamera();
             updateSceneElements();
             renderScene();
-            // V-sync and callbacks
-            glfwSwapBuffers(window);
-            glfwPollEvents();
+
+            window.update();
         }
     }
 
     /**
      * This initializer method does a few things:
      * <ul>
-     *  <li>Initializes GLFW and GL capabilities.</li>
      *  <li>Sets default OpenGL states.</li>
-     *  <li>Sets up vertex and index buffers for all loaded renderable objects</li>
+     *  <li>Sets up vertex buffers</li>
      *  <li>Creates a shader program.</li>
      * </ul>
      */
     private void init() {
-        // OpenGL and GLFW must-haves
-        setupGLFW();
-        GL.createCapabilities();
-        setupCallbacks();
-
         // OpenGL states
         glFrontFace(GL_CCW);
         glEnable(GL_CULL_FACE);
@@ -127,70 +110,13 @@ public class RenderSystem implements Runnable{
         glDepthFunc(GL_LEQUAL);
         glClearColor(0.2f, 0.2f, 0.2f, 1);
 
-        // Setup all the vertices!
-        setupBuffers();
+        // Create and bind the VAO
+        vao = glGenVertexArrays();
+        glBindVertexArray(vao);
 
         // Create shader program
         program = createProgram(VERT, FRAG);
         glUseProgram(program);
-    }
-
-    /**
-     * Helper method for setting up GLFW, creating a window and some default hints.
-     */
-    private void setupGLFW() {
-        // GLFW
-        GLFWErrorCallback.createPrint(System.err).set();
-        if (!glfwInit()) throw new IllegalStateException("Unable to initialize GLFW");
-
-        glfwDefaultWindowHints();
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        glfwWindowHint(GLFW_SAMPLES, 16);
-
-        window = glfwCreateWindow(Const.WINDOW_WIDTH, Const.WINDOW_HEIGHT, "Joe3D", NULL, NULL);
-        if (window == NULL) throw new RuntimeException("Failed to create the GLFW window");
-
-        try (MemoryStack stack = stackPush()) {
-            IntBuffer pWidth = stack.mallocInt(1);
-            IntBuffer pHeight = stack.mallocInt(1);
-            glfwGetWindowSize(window, pWidth, pHeight);
-            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            assert vidmode != null;
-            glfwSetWindowPos(window, (vidmode.width() - pWidth.get(0)) / 2, (vidmode.height() - pHeight.get(0)) / 2);
-        }
-
-        glfwMakeContextCurrent(window);
-        glfwSwapInterval(1);
-        glfwShowWindow(window);
-    }
-
-    /**
-     * Sets up callbacks such as key inputs and window actions.
-     */
-    private void setupCallbacks() {
-        // Setup a key callback
-        glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(window, true); // We will detect this in the systems.rendering loop
-        });
-
-        // Window resize callback
-        glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallback() {
-            @Override
-            public void invoke(long window, int width, int height) {
-                glViewport(0, 0, width, height);
-                cam.setPerspective((float) width / (float) height);
-            }
-        });
-    }
-
-    /**
-     * Sets up vao and vbos.
-     */
-    private void setupBuffers() {
-        vao = glGenVertexArrays();
-        glBindVertexArray(vao);
     }
 
     /**
@@ -235,17 +161,17 @@ public class RenderSystem implements Runnable{
     }
 
     private void updateCamera() {
-        // Update camera view
         cam.lookAt(cam.getTransform().getPosition().add(new Vector3f(0, 0, -1)));
-
-        // Create perspective and view matrices
-        pMat = cam.getPerspective();
         vMat = cam.getView();
+
+        // Update perspective if resized
+        if(window.isResized()){
+            cam.setPerspective((float)window.getWidth()/(float)window.getHeight());
+            pMat = cam.getPerspective();
+        }
     }
 
     private void updateSceneElements() {
-
-
         // Install lights TODO multiple light support
         light.getTransform().translate(6, 6, 6);
         installLights(vMat);
@@ -301,7 +227,7 @@ public class RenderSystem implements Runnable{
      * @param mesh      the 3d mesh to add to render info
      * @param transform the transform values to add to render info
      */
-    public int[] addRenderInfo(Mesh mesh, Transform transform) {
+    public int[] addRenderInfo(Mesh mesh, Transform transform) {    // TODO return type should be some integer identifier
         int[] vbo = new int[3];
         glGenBuffers(vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo[POSITION]);
@@ -346,10 +272,4 @@ public class RenderSystem implements Runnable{
         glProgramUniform3fv(program, posLoc, viewspaceLightPos);
     }
 
-    private void free() {
-        glfwFreeCallbacks(window);
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
-    }
 }

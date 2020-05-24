@@ -1,5 +1,3 @@
-import system.rendering.Camera;
-import game.core.Scene;
 import system.rendering.*;
 import utility.MeshBuilder;
 

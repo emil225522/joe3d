@@ -1,19 +1,21 @@
 package game.core;
 
 import system.rendering.Transform;
-import org.joml.Matrix4f;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * A generic game object. It is only described by its transform.
+ * A generic game object. It is only described by its transform and components.
  */
-public abstract class GameObject {
-    protected Transform transform;
-
+public class GameObject {
+    private Transform transform;
+    private Set<Component> components;
     /**
      * Creates a new game object.
      */
     public GameObject(){
         this.transform = new Transform();
+        this.components = new HashSet<>();
     }
 
     /**
@@ -22,5 +24,13 @@ public abstract class GameObject {
      */
     public Transform getTransform() {
         return transform;
+    }
+
+    public void start(){
+
+    }
+
+    public void update(){
+
     }
 }
