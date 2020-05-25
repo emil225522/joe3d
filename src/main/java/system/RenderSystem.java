@@ -184,7 +184,6 @@ public class RenderSystem {
         // Install lights TODO multiple light support
         if (renders.isEmpty()) return;
         light.getTransform().translate(6, 6, 6);
-        renders.get(0).getTransform().rotate(1, 0, 1, 0); // TODO remove debug
         installLights(vMat);
     }
 

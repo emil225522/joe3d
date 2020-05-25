@@ -20,10 +20,12 @@ public class SpinningMonkeyGame implements Game {
     public void init() {
         renderSystem = RenderSystem.get();
         Mesh mesh = MeshBuilder.build(MESHES + "suzanne.obj");
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                GameObject go = new GameObject(new MeshRenderer(mesh), new Rotator((40+10 * i * j) * (float) Math.pow(-1, j * i), 0, 1, 0));
-                go.getTransform().translate(-3 + 2 * i, -3f + 2 * j, -2);
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < 100; j++) {
+                GameObject go = new GameObject(
+                        new MeshRenderer(mesh),
+                        new Rotator((40+10 * i * j / 100) * (float) Math.pow(-1, j * i), 0, 1, 0));
+                go.getTransform().translate(-100 + 2 * i, -70f + 2 * j, -100);
                 gos.add(go);
             }
         }
