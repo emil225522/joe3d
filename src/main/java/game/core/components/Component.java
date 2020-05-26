@@ -1,4 +1,6 @@
-package game.core;
+package game.core.components;
+
+import game.core.GameObject;
 
 public abstract class Component {
     GameObject parent;

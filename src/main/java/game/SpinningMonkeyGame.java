@@ -1,9 +1,9 @@
 package game;
 
 import game.core.GameObject;
-import game.core.MeshRenderer;
-import game.core.Rotator;
-import system.RenderSystem;
+import game.core.components.LightSource;
+import game.core.components.MeshRenderer;
+import game.core.components.Rotator;
 import system.rendering.Mesh;
 import utility.MeshBuilder;
 
@@ -13,12 +13,10 @@ import java.util.Set;
 import static utility.Const.MESHES;
 
 public class SpinningMonkeyGame implements Game {
-    RenderSystem renderSystem;
     Set<GameObject> gos = new HashSet<>();
 
     @Override
     public void init() {
-        renderSystem = RenderSystem.get();
         Mesh mesh = MeshBuilder.build(MESHES + "suzanne.obj");
         for (int i = 0; i < 100; i++) {
             for (int j = 0; j < 100; j++) {
@@ -29,6 +27,9 @@ public class SpinningMonkeyGame implements Game {
                 gos.add(go);
             }
         }
+        GameObject light = new GameObject(new LightSource());
+        gos.add(light);
+        System.out.println("Init");
     }
 
     @Override

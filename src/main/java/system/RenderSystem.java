@@ -14,7 +14,7 @@ import static utility.Utils.*;
 /**
  * A 3D rendering engine.
  */
-public class RenderSystem {
+public class RenderSystem extends EngineSystem{
     private static RenderSystem instance; // TODO can the singleton pattern with startUp(), shutDown() and get() be templated elegantly?
 
     private Window window;
@@ -37,9 +37,7 @@ public class RenderSystem {
 
     // Render related
     private List<RenderInfo> renders;
-
-    // Debug lighting TODO remove shader testing light
-    Light light = new Light();
+    private Light light;
 
     /**
      * Creates an OpenGL 3D renderer, operating in a GLFW-managed window.
@@ -48,7 +46,7 @@ public class RenderSystem {
         this.window = window;
         this.renders = new Vector<>();
         this.cam = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
-        cam.getTransform().translate(0, 0, 5);
+        cam.getTransform().translate(0, 0, 5);  // TODO remove debug
     }
 
     /**
@@ -104,7 +102,7 @@ public class RenderSystem {
      *  <li>Creates a shader program.</li>
      * </ul>
      */
-    private void init() {
+    protected void init() {
         // OpenGL states
         glFrontFace(GL_CCW);
         glEnable(GL_CULL_FACE);
@@ -181,9 +179,8 @@ public class RenderSystem {
      *
      */
     private void updateSceneElements() {
-        // Install lights TODO multiple light support
-        if (renders.isEmpty()) return;
-        light.getTransform().translate(6, 6, 6);
+        // TODO multiple light support
+        if(light==null)return;
         installLights(vMat);
     }
 
@@ -250,10 +247,24 @@ public class RenderSystem {
         return vbo;
     }
 
+
+
     public boolean removeRenderInfo(int[] vbo) {
         glDeleteBuffers(vbo);
         return renders.remove(new RenderInfo(vbo, null, null));
 
+    }
+
+    // TODO multiple light support
+    public int addLight(Light light){
+        this.light = light;
+        return 0;   // TODO return light id for future remove referencing.
+    }
+
+    // TODO multiple light support
+    public boolean removeLight(){
+        light = null;
+        return true;
     }
 
     private void installLights(Matrix4f vMat) {
@@ -282,7 +293,7 @@ public class RenderSystem {
         glProgramUniform3fv(program, posLoc, viewspaceLightPos);
     }
 
-    private void free() {
+    protected void free() {
         glDeleteVertexArrays(vao);
         glDeleteBuffers(vbo);
         glDeleteProgram(program);

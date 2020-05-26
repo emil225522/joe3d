@@ -1,5 +1,6 @@
 package game.core;
 
+import game.core.components.Component;
 import system.rendering.Transform;
 
 import java.util.HashSet;

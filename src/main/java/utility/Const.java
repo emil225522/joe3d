@@ -8,7 +8,7 @@ public class Const {
     static public final String WINDOW_TITLE = "Joe3D";
     static public final int WINDOW_WIDTH = 512;
     static public final int WINDOW_HEIGHT = 512;
-
+    static public final boolean USE_VSYNC = true;
 
 
     /**

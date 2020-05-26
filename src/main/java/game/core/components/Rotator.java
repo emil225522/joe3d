@@ -1,4 +1,4 @@
-package game.core;
+package game.core.components;
 
 /**
  * A rotator component that spins the object around an axis.

@@ -1,4 +1,4 @@
-package game.core;
+package game.core.components;
 
 import system.RenderSystem;
 import system.rendering.Mesh;

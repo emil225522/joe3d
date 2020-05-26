@@ -1,4 +1,5 @@
 import game.Game;
+import system.input.InputSystem;
 import system.RenderSystem;
 import system.Window;
 
@@ -8,14 +9,15 @@ import static utility.Const.*;
  * An entry point for running the engine.
  */
 public class GameEngine {
-    private static Window window = new Window(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, true);    // TODO do like this...?
+    private static Window window = new Window(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, USE_VSYNC);    // TODO make its own system?
     public static void run(Game game) {
         // Start up systems in CORRECT ORDER
-
         RenderSystem.startUp(window);
+        InputSystem.startUp(window);
 
         // Get singletons
         RenderSystem renderer = RenderSystem.get();
+        InputSystem input = InputSystem.get();
 
         // Do game stuff
         game.init();
@@ -24,14 +26,15 @@ public class GameEngine {
         while (!window.windowShouldClose()) {
             float current = getTime();
             float elapsed = current - previous;
-            System.out.println(1/elapsed);
-            // TODO add input system here
-            game.update(elapsed);
+
+            input.update();
+            game.update(elapsed);   // TODO make game loop do steps, update game state til its time for rendering, then updates wont need the elapsed factor.
             renderer.update();      // TODO call from here or from Game?
             previous = current;
         }
 
         // Shut down systems in REVERSE ORDER
+        InputSystem.shutDown();
         RenderSystem.shutDown();
     }
 
