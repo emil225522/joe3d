@@ -23,12 +23,13 @@ public class Rotator extends Component {
     }
 
     @Override
-    void start() {
+    public void start() {
+
         // Do nothing
     }
 
     @Override
-    void update(float interval) {
+    public void update(float interval) {
         parent.getTransform().rotate(interval * rotationAmount, axisX, axisY, axisZ);
     }
 }

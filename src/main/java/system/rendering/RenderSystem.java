@@ -1,9 +1,10 @@
-package system;
+package system.rendering;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.joml.Matrix4f;
-import system.rendering.*;
+import system.EngineSystem;
+import system.Window;
 
 import java.util.*;
 
@@ -14,7 +15,7 @@ import static utility.Utils.*;
 /**
  * A 3D rendering engine.
  */
-public class RenderSystem extends EngineSystem{
+public class RenderSystem extends EngineSystem {
     private static RenderSystem instance; // TODO can the singleton pattern with startUp(), shutDown() and get() be templated elegantly?
 
     private Window window;

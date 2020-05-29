@@ -1,6 +1,6 @@
 package game.core.components;
 
-import system.RenderSystem;
+import system.rendering.RenderSystem;
 import system.rendering.Light;
 
 public class LightSource extends Component {
@@ -11,12 +11,12 @@ public class LightSource extends Component {
     }
 
     @Override
-    void start() {
+    public void start() {
         RenderSystem.get().addLight(light);
     }
 
     @Override
-    void update(float interval) {
+    public void update(float interval) {
         light.getTransform().setPosition(parent.getTransform().getPosition());
     }
 }

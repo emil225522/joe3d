@@ -10,19 +10,19 @@ public abstract class Component {
      *
      * @param obj game object to parent this component to
      */
-    void setParent(GameObject obj) {
+    public void setParent(GameObject obj) {
         this.parent = obj;
     }
 
     /**
      * Called at the start of the game.
      */
-    abstract void start();
+    public abstract void start();
 
     /**
      * Called every frame.
      *
      * @param interval time passed since last update
      */
-    abstract void update(float interval);
+    public abstract void update(float interval);
 }

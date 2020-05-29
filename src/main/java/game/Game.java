@@ -1,7 +1,6 @@
 package game;
 
 public interface Game {
-
     /**
      * Initializes the game. Always run this before starting the game.
      */

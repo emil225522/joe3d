@@ -1,6 +1,6 @@
 package game.core.components;
 
-import system.RenderSystem;
+import system.rendering.RenderSystem;
 import system.rendering.Mesh;
 
 /**
@@ -19,12 +19,12 @@ public class MeshRenderer extends Component {
     }
 
     @Override
-    void start() {
+    public void start() {
         RenderSystem.get().addRenderInfo(mesh, parent.getTransform());
     }
 
     @Override
-    void update(float interval) {
+    public void update(float interval) {
         // Called every frame
     }
 }

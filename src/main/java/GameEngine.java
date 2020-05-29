@@ -1,6 +1,6 @@
 import game.Game;
 import system.input.InputSystem;
-import system.RenderSystem;
+import system.rendering.RenderSystem;
 import system.Window;
 
 import static utility.Const.*;
