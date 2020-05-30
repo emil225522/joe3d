@@ -1,6 +1,6 @@
 import game.Game;
-import system.input.InputSystem;
-import system.rendering.RenderSystem;
+import system.InputSystem;
+import system.RenderSystem;
 import system.Window;
 
 import static utility.Const.*;
@@ -26,8 +26,8 @@ public class GameEngine {
         while (!window.windowShouldClose()) {
             float current = getTime();
             float elapsed = current - previous;
-
             input.update();
+            System.out.println(elapsed);
             game.update(elapsed);   // TODO make game loop do steps, update game state til its time for rendering, then updates wont need the elapsed factor.
             renderer.update();      // TODO call from here or from Game?
             previous = current;

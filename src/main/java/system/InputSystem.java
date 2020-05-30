@@ -1,23 +1,20 @@
-package system.input;
-
-import system.EngineSystem;
-import system.Window;
+package system;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class InputSystem extends EngineSystem {
+public class InputSystem {
     private static InputSystem instance;
 
     private Window window;
-    private Map<Integer, Boolean> keys;
+    private Map<Character, Boolean> keysHeld;
 
     /**
      * Creates an OpenGL 3D renderer, operating in a GLFW-managed window.
      */
     private InputSystem(Window window) {
         this.window = window;
-        this.keys = new HashMap<>();
+        this.keysHeld = window.getKeysHeld();
     }
 
     /**
@@ -50,18 +47,19 @@ public class InputSystem extends EngineSystem {
         return instance;
     }
 
-    @Override
-    protected void init() {
+    private void init() {
 
     }
 
-    @Override
-    protected void free() {
+    private void free() {
 
     }
 
-    @Override
     public void update() {
 
+    }
+
+    public boolean isKeyPressed(char key){
+        return keysHeld.getOrDefault(key, false);
     }
 }

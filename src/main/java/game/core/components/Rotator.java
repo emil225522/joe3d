@@ -24,12 +24,18 @@ public class Rotator extends Component {
 
     @Override
     public void start() {
-
-        // Do nothing
+        // Do nothing   FIXME ISP violation
     }
 
     @Override
     public void update(float interval) {
         parent.getTransform().rotate(interval * rotationAmount, axisX, axisY, axisZ);
     }
+
+    @Override
+    public void onRemove() {
+        // Do nothing FIXME ISP violation
+    }
+
+
 }

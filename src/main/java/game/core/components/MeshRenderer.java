@@ -1,12 +1,13 @@
 package game.core.components;
 
-import system.rendering.RenderSystem;
+import system.RenderSystem;
 import system.rendering.Mesh;
 
 /**
  * A renderable game object. In addition to being a game object, it also has a mesh and a material.
  */
 public class MeshRenderer extends Component {
+    private int[] bufferIds;
     private Mesh mesh;
 
     /**
@@ -20,11 +21,16 @@ public class MeshRenderer extends Component {
 
     @Override
     public void start() {
-        RenderSystem.get().addRenderInfo(mesh, parent.getTransform());
+        bufferIds = RenderSystem.get().addRenderInfo(mesh, parent.getTransform());  // TODO remove SRP violation
     }
 
     @Override
     public void update(float interval) {
         // Called every frame
+    }
+
+    @Override
+    public void onRemove() {
+        RenderSystem.get().removeRenderInfo(bufferIds);
     }
 }

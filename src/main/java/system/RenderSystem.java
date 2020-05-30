@@ -1,10 +1,9 @@
-package system.rendering;
+package system;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.joml.Matrix4f;
-import system.EngineSystem;
-import system.Window;
+import system.rendering.*;
 
 import java.util.*;
 
@@ -15,7 +14,7 @@ import static utility.Utils.*;
 /**
  * A 3D rendering engine.
  */
-public class RenderSystem extends EngineSystem {
+public class RenderSystem {
     private static RenderSystem instance; // TODO can the singleton pattern with startUp(), shutDown() and get() be templated elegantly?
 
     private Window window;
@@ -91,10 +90,6 @@ public class RenderSystem extends EngineSystem {
         window.update();
     }
 
-    public boolean shouldClose(){
-        return window.windowShouldClose();
-    }
-
     /**
      * This initializer method does a few things:
      * <ul>
@@ -166,7 +161,7 @@ public class RenderSystem extends EngineSystem {
      * Updates camera view, and perspective if window has been resized.
      */
     private void updateCamera() {
-        cam.lookAt(cam.getTransform().getPosition().add(new Vector3f(0, 0, -1)));
+        cam.lookAt(0,0,0);
         vMat = cam.getView();
 
         // Update perspective if resized
@@ -248,8 +243,6 @@ public class RenderSystem extends EngineSystem {
         return vbo;
     }
 
-
-
     public boolean removeRenderInfo(int[] vbo) {
         glDeleteBuffers(vbo);
         return renders.remove(new RenderInfo(vbo, null, null));
@@ -263,9 +256,13 @@ public class RenderSystem extends EngineSystem {
     }
 
     // TODO multiple light support
-    public boolean removeLight(){
-        light = null;
+    public boolean removeLight(Light light){
+        this.light = null;
         return true;
+    }
+
+    public Camera getCam() {
+        return cam;
     }
 
     private void installLights(Matrix4f vMat) {

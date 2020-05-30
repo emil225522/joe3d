@@ -1,6 +1,6 @@
 package game.core.components;
 
-import system.rendering.RenderSystem;
+import system.RenderSystem;
 import system.rendering.Light;
 
 public class LightSource extends Component {
@@ -18,5 +18,10 @@ public class LightSource extends Component {
     @Override
     public void update(float interval) {
         light.getTransform().setPosition(parent.getTransform().getPosition());
+    }
+
+    @Override
+    public void onRemove() {
+        RenderSystem.get().removeLight(light);
     }
 }

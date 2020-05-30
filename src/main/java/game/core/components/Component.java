@@ -25,4 +25,9 @@ public abstract class Component {
      * @param interval time passed since last update
      */
     public abstract void update(float interval);
+
+    /**
+     *  Called when the component is removed. Usually undoing what the start method did.
+     */
+    public abstract void onRemove();
 }

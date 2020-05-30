@@ -29,7 +29,6 @@ public class SpinningMonkeyGame implements Game {
         }
         GameObject light = new GameObject(new LightSource());
         gos.add(light);
-        System.out.println("Init");
     }
 
     @Override
