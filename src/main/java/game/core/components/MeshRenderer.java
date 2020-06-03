@@ -4,7 +4,7 @@ import system.RenderSystem;
 import system.rendering.Mesh;
 
 /**
- * A renderable game object. In addition to being a game object, it also has a mesh and a material.
+ * A renderable game object. It has a mesh and a material.
  */
 public class MeshRenderer extends Component {
     private int[] bufferIds;
@@ -16,6 +16,14 @@ public class MeshRenderer extends Component {
      * @param mesh the object mesh
      */
     public MeshRenderer(Mesh mesh) {
+        setMesh(mesh);
+    }
+
+    /**
+     * Sets the mesh of the mesh renderer component.
+     * @param mesh the mesh to render
+     */
+    public void setMesh(Mesh mesh){
         this.mesh = mesh;
     }
 

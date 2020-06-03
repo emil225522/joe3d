@@ -22,4 +22,6 @@ public class Const {
     public static final String MESHES = "./src/main/resources/meshes/";
 
     public static final String CONFIG = "./src/main/resources/config/";
+    public static final float TARGET_FPS = 60;
+
 }

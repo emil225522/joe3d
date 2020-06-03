@@ -83,6 +83,10 @@ public class Transform {
         position.set(x,y,z);
     }
 
+    public Vector3f getForward(){
+        return new Vector3f(0,0,1).rotate(rotation).normalize();
+    }
+
     public void setPosition(Vector3f newPosition){
         position.set(newPosition);
     }

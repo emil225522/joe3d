@@ -1,5 +1,4 @@
 package game.core.components;
-
 import game.core.GameObject;
 
 public abstract class Component {
@@ -30,4 +29,8 @@ public abstract class Component {
      *  Called when the component is removed. Usually undoing what the start method did.
      */
     public abstract void onRemove();
+
+    protected <T> T getSibling(Class<?> cls){
+        return parent.getComponent(cls);
+    }
 }

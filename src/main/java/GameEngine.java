@@ -8,9 +8,16 @@ import static utility.Const.*;
 /**
  * An entry point for running the engine.
  */
-public class GameEngine {
-    private static Window window = new Window(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, USE_VSYNC);    // TODO make its own system?
-    public static void run(Game game) {
+public class GameEngine implements Runnable {
+    private Window window = new Window(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, USE_VSYNC);
+    private Game game;
+
+    public GameEngine(Game game) {
+        this.game = game;
+    }
+
+    @Override
+    public void run() {
         // Start up systems in CORRECT ORDER
         RenderSystem.startUp(window);
         InputSystem.startUp(window);
@@ -22,14 +29,17 @@ public class GameEngine {
         // Do game stuff
         game.init();
         game.start();
-        float previous = getTime();
+
+        long current = 0;
+        long previous = getTime();
         while (!window.windowShouldClose()) {
-            float current = getTime();
-            float elapsed = current - previous;
+            current = getTime();
+            float elapsed = (current - previous) / 1000f;
+
             input.update();
-            System.out.println(elapsed);
-            game.update(elapsed);   // TODO make game loop do steps, update game state til its time for rendering, then updates wont need the elapsed factor.
-            renderer.update();      // TODO call from here or from Game?
+            game.update(elapsed);
+            renderer.update();
+
             previous = current;
         }
 
@@ -38,7 +48,18 @@ public class GameEngine {
         RenderSystem.shutDown();
     }
 
-    private static float getTime() {
-        return (float)System.nanoTime() / (float)1000000000.0;
+    private void sync(long current) {
+        long loopSlot = 1000 / 50;
+        float endTime = current + loopSlot;
+        while (getTime() < endTime) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
+    private long getTime() {
+        return System.nanoTime() / 1000000;
     }
 }
