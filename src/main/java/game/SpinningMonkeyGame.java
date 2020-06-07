@@ -1,10 +1,7 @@
 package game;
 
 import game.core.GameObject;
-import game.core.components.LightSource;
-import game.core.components.MeshRenderer;
-import game.core.components.PlayerController;
-import game.core.components.Rotator;
+import game.core.components.*;
 import system.rendering.Mesh;
 import utility.MeshBuilder;
 
@@ -23,7 +20,6 @@ public class SpinningMonkeyGame implements Game {
             for (int j = 0; j < 100; j++) {
                 GameObject go = new GameObject(
                         new MeshRenderer(mesh),
-                        new PlayerController(),
                         new Rotator((40+10 * i * j / 100) * (float) Math.pow(-1, j * i), 0, 1, 0));
                 go.getTransform().translate(-100 + 2 * i, -70f + 2 * j, -100);
                 gos.add(go);

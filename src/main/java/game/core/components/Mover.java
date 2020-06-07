@@ -6,7 +6,7 @@ public class Mover extends Component {
 
     Controller controller;
     private float speed = 5;
-    private float rotateSpeed = 120;
+    private float rotateSpeed = 240;
 
     @Override
     public void start() {
