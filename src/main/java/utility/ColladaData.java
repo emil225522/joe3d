@@ -1,38 +1,63 @@
 package utility;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 public class ColladaData {
-    Map<String, String> nodes = new HashMap<>();
-    Map<String, Map<String, String>> attributes = new HashMap<>();
-    Map<String, String> texts = new HashMap<>();
+    private String id;
+    private int numTriangles;
+    private float[] positions;
+    private float[] normals;
+    private float[] texCoords;
+    private int[] indices;
 
-    public void addNode(String key, String value){
-        nodes.put(key,value);
+    public ColladaData(String id, int numTriangles) {
+        this.id = id;
+        this.numTriangles = numTriangles;
     }
 
-    public void addAttributes(String key, Map<String,String> attrs){
-        attributes.put(key, attrs);
+    public void setPositions(float[] positions) {
+        this.positions = positions;
     }
 
-    public void addTextContent(String key, String value){
-        texts.put(key, value);
+    public void setNormals(float[] normals) {
+        this.normals = normals;
+    }
+
+    public void setTexCoords(float[] texCoords) {
+        this.texCoords = texCoords;
+    }
+
+    public void setIndices(int[] indices) {
+        this.indices = indices;
+    }
+
+    public float[] getPositions() {
+
+        return null; // TODO build array with indices
+    }
+
+    public float[] getNormals() {
+        return null; // TODO build array with indices
+    }
+
+    public float[] getTexCoords() {
+        return null; // TODO build array with indices
     }
 
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        nodes.forEach((key, value) -> {
-            sb.append(key + " : " + value + "\n");
-            if(attributes.containsKey(key)){
-                Map<String, String> attrs = attributes.get(key);
-                attrs.forEach((akey, avalue) -> {
-                    sb.append("\t\t" + akey + " : " + avalue + "\n");
-                });
-            }
-            if(texts.containsKey(key)) sb.append("\t\t" + "TextContent : " + texts.get(key) + "\n");
-        });
-        return sb.toString();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ColladaData that = (ColladaData) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    public int[] getIndices() {
+        return indices;
     }
 }

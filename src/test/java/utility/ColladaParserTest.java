@@ -9,6 +9,5 @@ class ColladaParserTest {
     @Test
     public void parseCollada(){
         ColladaData data = ColladaParser.parse(Const.MESHES+"cube.dae");
-        System.out.println(data);
     }
 }
